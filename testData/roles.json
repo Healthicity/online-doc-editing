@@ -1,0 +1,69 @@
+[{
+  "_id": {
+    "$oid": "62545ddaade4d556f5b57e3b"
+  },
+  "permissions": [
+    {
+      "$oid": "62544767ade4d556f5b57e1f"
+    },
+    {
+      "$oid": "62544767ade4d556f5b57e20"
+    },
+    {
+      "$oid": "62544767ade4d556f5b57e21"
+    },
+    {
+      "$oid": "62544767ade4d556f5b57e22"
+    },
+    {
+      "$oid": "62544767ade4d556f5b57e23"
+    },
+    {
+      "$oid": "62544767ade4d556f5b57e24"
+    },
+    {
+      "$oid": "62544767ade4d556f5b57e25"
+    }
+  ],
+  "type": "Admin",
+  "code": "01"
+},{
+  "_id": {
+    "$oid": "62545ddaade4d556f5b57e3c"
+  },
+  "permissions": [
+    {
+      "$oid": "62544767ade4d556f5b57e21"
+    },
+    {
+      "$oid": "62544767ade4d556f5b57e23"
+    }
+  ],
+  "type": "Reviewer",
+  "code": "02"
+},{
+  "_id": {
+    "$oid": "62545ddaade4d556f5b57e3d"
+  },
+  "permissions": [
+    {
+      "$oid": "62544767ade4d556f5b57e22"
+    },
+    {
+      "$oid": "62544767ade4d556f5b57e23"
+    }
+  ],
+  "type": "Editor",
+  "code": "03"
+},{
+  "_id": {
+    "$oid": "62545ddaade4d556f5b57e3e"
+  },
+  "permissions": [
+    {
+      "$oid": "62544767ade4d556f5b57e23"
+    }
+  ],
+  "type": "Viewer",
+  "code": "04"
+}]

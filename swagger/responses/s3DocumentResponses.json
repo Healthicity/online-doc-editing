@@ -1,0 +1,359 @@
+{
+  "AllObjects200Response": {
+    "description": "All objects successfully retreived",
+    "content": {
+      "application/json": {
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "Key": {
+                "type": "string",
+                "description": "The name of the file"
+              },
+              "LastModified": {
+                "type": "string",
+                "format": "date-time",
+                "description": "The last date it was updated"
+              },
+              "ETag": {
+                "type": "string",
+                "description": "An entity tag of the document to be able to compare to other objects or files"
+              },
+              "ChecksumAlgorithm": {
+                "type": "array",
+                "items": {}
+              },
+              "Size": {
+                "type": "integer",
+                "description": "The size of the file"
+              },
+              "StorageClass": {
+                "type": "string",
+                "description": "The type of storage class of the file"
+              },
+              "Owner": {
+                "type": "object",
+                "properties": {
+                  "DisplayName": {
+                    "type": "string",
+                    "description": "The display name"
+                  },
+                  "ID": {
+                    "type": "string",
+                    "description": "The ID of the owner"
+                  }
+                }
+              },
+              "contentType": {
+                "type": "string",
+                "description": "The content type of the document"
+              },
+              "extension": {
+                "type": "string",
+                "description": "The extension of the file"
+              },
+              "bucket": {
+                "type": "string",
+                "description": "The bucket name where file is stored"
+              },
+              "versions": {
+                "type":"array",
+                "items": {
+                  "$ref": "#/components/schemas/S3Document"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "AllDeleteMarkers200Response": {
+    "description": "All delete markers object successfully retreived",
+    "content": {
+      "application/json": {
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "Owner": {
+                "type": "object",
+                "properties": {
+                  "DisplayName": {
+                    "type": "string",
+                    "description": "The display name"
+                  },
+                  "ID": {
+                    "type": "string",
+                    "description": "The ID of the owner"
+                  }
+                }
+              },
+              "Key": {
+                "type": "string",
+                "description": "The name of the file"
+              },
+              "VersionId": {
+                "type": "string",
+                "description": "The unique Id of the version document",
+                "nullable": false
+              },
+              "IsLatest": {
+                "type": "boolean",
+                "description": "Represents if the version is the latest version, thus, is the main document.",
+                "nullable": false
+              },
+              "LastModified": {
+                "type": "string",
+                "format": "date-time",
+                "description": "The last date it was updated"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "OneObject200Response": {
+    "description": "One object successfully retrieved",
+    "content": {
+      "application/json": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "AcceptRanges": {
+              "type": "string",
+              "description": "The unit type in which is stored the document",
+              "default": "bytes"
+            }, 
+            "LastModified": {
+              "type": "string",
+              "format": "date-time",
+              "description": "The last date it was updated"
+            },
+            "ContentLength":{
+              "type": "integer",
+              "description": "The length content of the document.",
+              "nullable": false
+            },
+            "ETag": {
+              "type": "string",
+              "description": "An entity tag of the document to be able to compare to other objects or files"
+            },
+            "VersionId": {
+              "type": "string",
+              "description": "The unique Id of the version document",
+              "nullable": false
+            },
+            "ContentType": {
+              "type": "string",
+              "description": "The content type of the document"
+            },
+            "Metadata": {
+              "type": "object"
+            },
+            "Body": {
+              "type": "string",
+              "format": "binary"
+            }
+          }
+        }
+      }
+    }
+  },
+  "UploadFile201Response": {
+    "description": "Upload file to the S3 bucket successfully",
+    "content": {
+      "application/json": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "data": {
+              "type": "string",
+              "description": "Location data"
+            },
+            "message": {
+              "type": "string",
+              "description": "The successfull message",
+              "default": "The file was uploaded successfully."
+            }
+          }
+        }
+      }
+    }
+  },
+  "UpdateObject201Response": {
+    "description": "One object successfully updated",
+    "content": {
+      "application/json": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "data": {
+              "type": "object"
+            },
+            "message": {
+              "type": "string",
+              "description": "Successfull message",
+              "default": "The file was successfully restored to latest version: ${dataUpdated.VersionId}."
+            }
+          }
+        }
+      }
+    }
+  },
+  "DeleteObject201Response": {
+    "description": "One object successfully deleted",
+    "content": {
+      "application/json": {
+        "schema": {
+          "oneOf": [
+            {
+              "type": "object",
+              "properties": {
+                "data": {
+                  "type": "object",
+                  "properties": {
+                    "VersionId": {
+                      "type": "string",
+                      "description": "The version id of the document that was deleted"
+                    }
+                  }
+                },
+                "message": {
+                  "type": "string",
+                  "description": "The successfull message",
+                  "default": "Version: ${versionId} of document ${key} permanently deleted."
+                }
+              }
+            },
+            {
+              "type": "object",
+              "properties": {
+                "data": {
+                  "type": "object",
+                  "properties": {
+                    "DeleteMarker": {
+                      "type": "boolean",
+                      "description": "Indicates if the document is temporary deleted"
+                    },
+                    "VersionId": {
+                      "type": "string",
+                      "description": "The version id of the document that was deleted"
+                    }
+                  }
+                },
+                "message": {
+                  "type": "string",
+                  "description": "The successfull message",
+                  "default": "File versionId: ${data.VersionId} successfully restored."
+                }
+              }
+            },
+            {
+              "type": "object",
+              "properties": {
+                "data": {
+                  "type": "object",
+                  "properties": {
+                    "VersionId": {
+                      "type": "string",
+                      "description": "The version id of the document that was deleted"
+                    }
+                  }
+                },
+                "message": {
+                  "type": "string",
+                  "description": "The successfull message",
+                  "default": "File ${key} successfully sent to trash."
+                }
+              }
+            }
+          ]
+        }
+      }
+    }
+  },
+  "AllObjectVersions200Response": {
+    "description": "All versions of an object with specific key name prefix successfully retrieved",
+    "content": {
+      "application/json": {
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "ETag": {
+                "type": "string",
+                "description": "An entity tag of the document to be able to compare to other objects or files"
+              },
+              "ChecksumAlgorithm": {
+                "type": "array",
+                "items": {}
+              },
+              "Size": {
+                "type": "integer",
+                "description": "The size of the file"
+              },
+              "StorageClass": {
+                "type": "string",
+                "description": "The type of storage class of the file"
+              },
+              "Key": {
+                "type": "string",
+                "description": "The name of the file"
+              },
+              "VersionId": {
+                "type": "string",
+                "description": "The unique Id of the version document",
+                "nullable": false
+              },
+              "IsLatest": {
+                "type": "boolean",
+                "description": "Represents if the version is the latest version, thus, is the main document.",
+                "nullable": false
+              },
+              "LastModified": {
+                "type": "string",
+                "format": "date-time",
+                "description": "The last date it was updated"
+              },
+              "Owner": {
+                "type": "object",
+                "properties": {
+                  "DisplayName": {
+                    "type": "string",
+                    "description": "The display name"
+                  },
+                  "ID": {
+                    "type": "string",
+                    "description": "The ID of the owner"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "RestoreObject200Response": {
+    "description": "One document with a delete marker successfully restored!",
+    "content": {
+      "application/json": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "message": {
+              "type": "string",
+              "default": "Document: ${key} successfully restored!"
+            }
+          }
+        }
+      }
+    }
+  }
+}

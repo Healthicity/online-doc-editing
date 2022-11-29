@@ -1,0 +1,43 @@
+[{
+  "_id": {
+    "$oid": "62544767ade4d556f5b57e1f"
+  },
+  "type": "Approve",
+  "code": "01"
+},{
+  "_id": {
+    "$oid": "62544767ade4d556f5b57e20"
+  },
+  "type": "Reject",
+  "code": "02"
+},{
+  "_id": {
+    "$oid": "62544767ade4d556f5b57e21"
+  },
+  "type": "Review",
+  "code": "03"
+},{
+  "_id": {
+    "$oid": "62544767ade4d556f5b57e22"
+  },
+  "type": "Edit",
+  "code": "04"
+},{
+  "_id": {
+    "$oid": "62544767ade4d556f5b57e23"
+  },
+  "type": "View",
+  "code": "05"
+},{
+  "_id": {
+    "$oid": "62544767ade4d556f5b57e24"
+  },
+  "type": "Remove",
+  "code": "06"
+},{
+  "_id": {
+    "$oid": "62544767ade4d556f5b57e25"
+  },
+  "type": "Restore",
+  "code": "07"
+}]

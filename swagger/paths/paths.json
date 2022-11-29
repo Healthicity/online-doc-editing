@@ -1,0 +1,216 @@
+{
+  "/api_buckets/objects": {
+    "get": {
+      "operationId": "allObjects",
+      "summary": "Get all objects from one bucket",
+      "tags": ["S3 Bucket"],
+      "security": [],
+      "parameters": [
+        { "$ref": "#/components/parameters/bucketParam" },
+        { "$ref": "#/components/parameters/maxParam" }
+      ],
+      "responses": {
+        "200": {
+          "$ref": "#/components/responses/AllObjects200Response"
+        },
+        "401": {
+          "$ref": "#/components/responses/Unauthorized"
+        },
+        "404": {
+          "$ref": "#/components/responses/NotFound"
+        },
+        "422": {
+          "$ref": "#/components/responses/UnprocessableEntity"
+        },
+        "500": {
+          "$ref": "#/components/responses/InternalServerError"
+        }
+      }
+    }
+  },
+  "/api_buckets/objects/versions": {
+    "get": {
+      "operationId": "allObjectVersions",
+      "summary": "Get all object versions from one bucket",
+      "tags": ["S3 Bucket"],
+      "parameters": [
+        { "$ref": "#/components/parameters/bucketParam" },
+        { "$ref": "#/components/parameters/prefixParam" }
+      ],
+      "responses": {
+        "200": {
+          "$ref": "#/components/responses/AllObjectVersions200Response"
+        },
+        "400": {
+          "$ref": "#/components/responses/BadRequest"
+        },
+        "401": {
+          "$ref": "#/components/responses/Unauthorized"
+        },
+        "404": {
+          "$ref": "#/components/responses/NotFound"
+        },
+        "422": {
+          "$ref": "#/components/responses/UnprocessableEntity"
+        },
+        "500": {
+          "$ref": "#/components/responses/InternalServerError"
+        }
+      }
+    }
+  },
+  "/api_buckets/objects/versions/one": {
+    "get": {
+      "operationId": "oneObject",
+      "summary": "Get one specific object",
+      "tags": ["S3 Bucket"],
+      "parameters": [
+        { "$ref": "#/components/parameters/bucketParam" },
+        { "$ref": "#/components/parameters/keyParam" },
+        { "$ref": "#/components/parameters/versionIdParam" }
+      ],
+      "responses": {
+        "200": {
+          "$ref": "#/components/responses/OneObject200Response"
+        },
+        "400": {
+          "$ref": "#/components/responses/BadRequest"
+        },
+        "401": {
+          "$ref": "#/components/responses/Unauthorized"
+        },
+        "404": {
+          "$ref": "#/components/responses/NotFound"
+        },
+        "422": {
+          "$ref": "#/components/responses/UnprocessableEntity"
+        },
+        "500": {
+          "$ref": "#/components/responses/InternalServerError"
+        }
+      }
+    }
+  },
+  "/api_buckets/delete-markers": {
+    "get": {
+      "operationId": "allDeleteMarkers",
+      "summary": "Get all delete markers objects",
+      "tags": ["S3 Bucket"],
+      "parameters": [
+        { "$ref": "#/components/parameters/bucketParam" }
+      ],
+      "responses": {
+        "200": {
+          "$ref": "#/components/responses/AllDeleteMarkers200Response"
+        },
+        "400": {
+          "$ref": "#/components/responses/BadRequest"
+        },
+        "401": {
+          "$ref": "#/components/responses/Unauthorized"
+        },
+        "404": {
+          "$ref": "#/components/responses/NotFound"
+        },
+        "422": {
+          "$ref": "#/components/responses/UnprocessableEntity"
+        },
+        "500": {
+          "$ref": "#/components/responses/InternalServerError"
+        }
+      }
+    }
+  },
+  "/api_buckets/object": {
+    "post": {
+      "operationId": "uploadFile",
+      "summary": "Upload a file/object to a bucket",
+      "tags": ["S3 Bucket"],
+      "requestBody": {
+        "$ref": "#/components/requestBodies/UploadFileBody"
+      },
+      "responses": {
+        "201": {
+          "$ref": "#/components/responses/UploadFile201Response"
+        },
+        "400": {
+          "$ref": "#/components/responses/BadRequest"
+        },
+        "401": {
+          "$ref": "#/components/responses/Unauthorized"
+        },
+        "404": {
+          "$ref": "#/components/responses/NotFound"
+        },
+        "422": {
+          "$ref": "#/components/responses/UnprocessableEntity"
+        },
+        "500": {
+          "$ref": "#/components/responses/InternalServerError"
+        }
+      }
+    },
+    "delete": {
+      "operationId": "deleteObject",
+      "summary": "Delete object version",
+      "tags": ["S3 Bucket"],
+      "parameters": [
+        { "$ref": "#/components/parameters/bucketParam" },
+        { "$ref": "#/components/parameters/keyParam" },
+        { "$ref": "#/components/parameters/versionIdParam" }
+      ],
+      "responses": {
+        "201": {
+          "$ref": "#/components/responses/DeleteObject201Response"
+        },
+        "400": {
+          "$ref": "#/components/responses/BadRequest"
+        },
+        "401": {
+          "$ref": "#/components/responses/Unauthorized"
+        },
+        "404": {
+          "$ref": "#/components/responses/NotFound"
+        },
+        "422": {
+          "$ref": "#/components/responses/UnprocessableEntity"
+        },
+        "500": {
+          "$ref": "#/components/responses/InternalServerError"
+        }
+      }
+    }
+  },
+  "/api_buckets/object/restore": {
+    "delete": {
+      "operationId": "restoreObject",
+      "summary": "Restore one object that has a delete marker",
+      "tags": ["S3 Bucket"],
+      "parameters": [
+        { "$ref": "#/components/parameters/bucketParam" },
+        { "$ref": "#/components/parameters/keyParam" },
+        { "$ref": "#/components/parameters/versionIdParam" }
+      ],
+      "responses": {
+        "201": {
+          "$ref": "#/components/responses/RestoreObject200Response"
+        },
+        "400": {
+          "$ref": "#/components/responses/BadRequest"
+        },
+        "401": {
+          "$ref": "#/components/responses/Unauthorized"
+        },
+        "404": {
+          "$ref": "#/components/responses/NotFound"
+        },
+        "422": {
+          "$ref": "#/components/responses/UnprocessableEntity"
+        },
+        "500": {
+          "$ref": "#/components/responses/InternalServerError"
+        }
+      }
+    }
+  }
+}

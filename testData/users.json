@@ -1,0 +1,56 @@
+[{
+  "_id": {
+    "$oid": "6254609bade4d556f5b57e46"
+  },
+  "firstName": "Leandro",
+  "lastName": "Casique",
+  "email": "leandro@example.com",
+  "roleId": {
+    "$oid": "62545ddaade4d556f5b57e3e"
+  },
+  "password": "leandro123"
+},{
+  "_id": {
+    "$oid": "6254609bade4d556f5b57e44"
+  },
+  "firstName": "Giovanni",
+  "lastName": "Giannola",
+  "email": "giovanni@example.com",
+  "roleId": {
+    "$oid": "62545ddaade4d556f5b57e3b"
+  },
+  "password": "giovanni123"
+},{
+  "_id": {
+    "$oid": "6254609bade4d556f5b57e42"
+  },
+  "firstName": "Fernando",
+  "lastName": "Hernandez",
+  "email": "fernando@example.com",
+  "roleId": {
+    "$oid": "62545ddaade4d556f5b57e3b"
+  },
+  "password": "fernando123"
+},{
+  "_id": {
+    "$oid": "6254609bade4d556f5b57e45"
+  },
+  "firstName": "Felipe",
+  "lastName": "Nazal",
+  "email": "felipe@example.com",
+  "roleId": {
+    "$oid": "62545ddaade4d556f5b57e3d"
+  },
+  "password": "felipe123"
+},{
+  "_id": {
+    "$oid": "6254609bade4d556f5b57e43"
+  },
+  "firstName": "Juan",
+  "lastName": "Robles",
+  "email": "juan@example.com",
+  "roleId": {
+    "$oid": "62545ddaade4d556f5b57e3c"
+  },
+  "password": "juan123"
+}]

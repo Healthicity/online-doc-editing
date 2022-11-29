@@ -1,0 +1,82 @@
+{
+  "UploadFileBody": {
+    "description": "A body containing the upload file information",
+    "required": true,
+    "content": {
+      "multipart/form-data": {
+        "schema": {
+          "type": "object",
+          "required": [
+            "bucketName",
+            "filename"
+          ],
+          "properties": {
+            "bucketName": {
+              "type": "string",
+              "default": "doc-api-bucket",
+              "description": "Bucket name (include folder name if your file will be store inside a folder)",
+              "nullable": false
+            },
+            "filename": {
+              "type": "string",
+              "format": "binary",
+              "description": "Name of the file"
+            }
+          }
+        }
+      }
+    }
+  },
+  "UpdateObjectBody": {
+    "description":"A body containing the updated object information",
+    "required": true,
+    "content": {
+      "application/json": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "bucket": {
+              "type": "string",
+              "description": "The bucket where the object is stored"
+            },
+            "key": {
+              "type": "string",
+              "description": "The name of the file"
+            } ,
+            "versionId": {
+              "type": "string",
+              "description": "The version id of the file to update"
+            },
+            "tag": {
+              "type": "string",
+              "description": "The entity tag of the file to update"
+            }
+          }
+        }
+      },
+      "application/x-www-form-urlencoded": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "bucket": {
+              "type": "string",
+              "description": "The bucket where the object is stored"
+            },
+            "key": {
+              "type": "string",
+              "description": "The name of the file"
+            } ,
+            "versionId": {
+              "type": "string",
+              "description": "The version id of the file to update"
+            },
+            "tag": {
+              "type": "string",
+              "description": "The entity tag of the file to update"
+            }
+          }
+        }
+      }
+    }
+  }
+}

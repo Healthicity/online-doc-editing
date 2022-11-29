@@ -1,0 +1,119 @@
+{
+  "S3Document": {
+    "type":"object",
+    "required":[
+      "provider_id",
+      "visit_id",
+      "claim_id",
+      "patient_id"
+    ],
+    "properties": {
+      "_id":{
+        "type":"string",
+        "description":"The auto-generated object id of the s3 document",
+        "readOnly": true
+      },
+      "bucket": {
+        "type": "string",
+        "description":"The bucket name where the document is stored",
+        "nullable": false
+      },
+      "filename": {
+        "type": "string",
+        "description":"The name of the file",
+        "nullable": false
+      },
+      "path":{
+        "type":"string",
+        "description":"The current path where the document is located in s3",
+        "nullable": false
+      },
+      "content": {
+        "type": "string",
+        "format": "binary",
+        "description": "The content of the document in binary format",
+        "nullable": false
+      },
+      "body":{
+        "type":"object",
+        "properties": {
+          "ops": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          }
+        },
+        "description":"The body of the document expressed in Quill's text editor format called Delta"
+      },
+      "versions": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "etag": {
+              "type": "string",
+              "description": "An entity tag of the document to be able to compare to other objects or files",
+              "nullable": false
+            },
+            "isLatest": {
+              "type": "boolean",
+              "description": "Represents if the version is the latest version, thus, is the main document.",
+              "nullable": false
+            },
+            "lastModified": {
+              "type": "string",
+              "format": "date-time",
+              "description": "The date when the version was modified for last time",
+              "nullable": false
+            },
+            "versionId": {
+              "type": "string",
+              "description": "The unique Id of the version document",
+              "nullable": false
+            },
+            "body": {
+              "type":"object",
+              "properties": {
+                "ops": {
+                  "type": "array",
+                  "items": {
+                    "type": "object"
+                  }
+                }
+              },
+              "description":"The body of the document expressed in Quill's text editor format called Delta"
+            },
+            "content": {
+              "type": "string",
+              "format": "binary",
+              "description": "The content of the document in binary format",
+              "nullable": false
+            }
+          }
+        }
+      },
+      "extension":{
+        "type":"string",
+        "description":"Extension or file type of the document. (.docx, .pdf, etc)",
+        "nullable": false
+      },
+      "lastModified": {
+        "type": "string",
+        "format": "date-time",
+        "description": "The date when the version was modified for last time",
+        "nullable": false
+      },
+      "contentLength":{
+        "type": "integer",
+        "description": "The length content of the document.",
+        "nullable": false
+      },
+      "etag": {
+        "type": "string",
+        "description": "An entity tag of the document to be able to compare to other objects or files",
+        "nullable": false
+      }
+    }
+  }
+}
