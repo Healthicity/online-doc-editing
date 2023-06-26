@@ -1,5 +1,5 @@
 const AWS = require('aws-sdk')
-const { accessKeyId, secretAccessKey } = require('../config/config-env')
+const { accessKeyId, secretAccessKey } = require('../config/configurations')
 
 const s3 = new AWS.S3({
   accessKeyId,

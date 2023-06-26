@@ -1,9 +1,9 @@
 'use strict'
 const handleError = require('../middlewares/handleError')
-const DocumentModel = require('../models/document.model')
-const DocumentDraftModel = require('../models/document_draft.model')
-const StateModel = require('../models/state.model')
-const DocumentVersionModel = require('../models/document_version.model')
+const DocumentModel = require('../models/document')
+const DocumentDraftModel = require('../models/documentdraft')
+const StateModel = require('../models/state')
+const DocumentVersionModel = require('../models/documentversion')
 
 class Document {
   static limit = 30

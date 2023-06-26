@@ -2,9 +2,9 @@
 const mammoth = require('mammoth')
 const { getDeltaFromHtml } = require('../quillConversion')
 const through2 = require('through2')
-const DocumentModel = require('../../models/document.model')
-const DocumentDraftModel = require('../../models/document_draft.model')
-const StateModel = require('../../models/state.model')
+const DocumentModel = require('../../models/document')
+const DocumentDraftModel = require('../../models/documentdraft')
+const StateModel = require('../../models/state')
 
 let s3File = {}
 

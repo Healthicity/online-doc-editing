@@ -1,8 +1,8 @@
 'use strict'
 
-const DraftDocumentModel = require('../models/document_draft.model')
-const DocumentVersionModel = require('../models/document_version.model')
-// const EditionModel = require('../models/edition.model')
+const DraftDocumentModel = require('../models/documentdraft')
+const DocumentVersionModel = require('../models/documentversion')
+// const EditionModel = require('../models/edition')
 
 const OnlineUsers = require('../util/onlineUsers')
 const onlineUsers = new OnlineUsers()

@@ -1,10 +1,9 @@
 'use strict'
 const app = require('../app')
 // eslint-disable-next-line camelcase
-const { port, endpoint, db_mongo_host } = require('../config/config-env')
+const { envPort, endpoint, dbHost } = require('../config/configurations');
 const { Server } = require('socket.io')
-const mongoConnection = require('../config/mongo-connection')
-const http = require('http')
+const http = require('http');
 const server = http.createServer(app)
 const io = new Server(server, {
   cors: {
@@ -24,19 +23,13 @@ const onConnection = socket => {
 // Socketio connection
 io.on('connection', onConnection)
 
-// Database connection ----------------------------------
-mongoConnection
-  .then(() =>
-    console.log('Connection to MongoDB successfully achieved!')
-  )
-  .catch((err) => console.log(`Connection to MongoDB rejected!: ${err}`))
 
 // Listen to server
-server.listen(port, () => {
-  port
+server.listen(envPort, () => {
+  envPort
     ? console.log(
         // eslint-disable-next-line camelcase
-        `Express server running on port: ${port}, endpoint: ${endpoint}, env: ${process.env.NODE_ENV}, db_host: ${db_mongo_host}`
+        `Express server running on port: ${envPort}, endpoint: ${endpoint}, env: ${process.env.NODE_ENV}, db_host: ${dbHost}`
       )
     : console.log('Error connecting to server!')
-})
+});
