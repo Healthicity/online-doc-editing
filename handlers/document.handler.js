@@ -218,10 +218,11 @@ module.exports = (io, socket) => {
   socket.on('documents:getDraftDocumentById', getDraftDocumentById) // Get draft document by id
 
   // When a user disconnects
-  socket.on('disconnect', () => {
+  socket.on('disconnect', (reason) => {
     console.log(socket.id, 'disconnected')
+    console.log(`A user has disconnected: ${reason}`)
     const removedUser = onlineUsers.removeUser(socket.id)
-    // console.log(removedUser.room)
+    if (!removedUser) return
     io.emit('documents:getOnlineUsers', onlineUsers.getUserList(removedUser.room))
     io.to(removedUser.room).emit('documents:removeCursor', removedUser)
   })
