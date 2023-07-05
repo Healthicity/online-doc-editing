@@ -227,12 +227,10 @@ module.exports = (io, socket) => {
 
   // When a user disconnects
   socket.on('disconnect', (reason) => {
-    console.log(socket.id, 'disconnected');
-    console.log(`A user has disconnected: ${reason}`);
-
+    console.log(socket.id, 'disconnected')
+    console.log(`A user has disconnected: ${reason}`)
     const removedUser = onlineUsers.removeUser(socket.id)
-    if (!removedUser) return;
-    
+    if (!removedUser) return
     io.emit('documents:getOnlineUsers', onlineUsers.getUserList(removedUser.room))
     io.to(removedUser.room).emit('documents:removeCursor', removedUser)
   })
