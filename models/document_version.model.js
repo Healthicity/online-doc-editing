@@ -30,7 +30,7 @@ DocumentVersion.statics.findByDocId = async function (docId, versionLimit) {
 }
 
 DocumentVersion.statics.findRecentVersions = async function (docId, versionLimit = 200) {
-  return await this.find({ documentId: docId }, 'lastModified versionId versionName userId')
+  return await this.find({ documentId: docId }, 'body lastModified versionId versionName userId')
     .sort({ lastModified: 'desc' })
     .limit(versionLimit)
     .populate('userId')
