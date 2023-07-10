@@ -9,7 +9,7 @@ module.exports = {
         primaryKey: true,
         autoIncrement: true,
       },
-      documentDraftId: {
+      documentId: {
         type: Sequelize.INTEGER,
         references: {
           model: 'Documents', // The name of the referenced table

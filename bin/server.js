@@ -1,7 +1,7 @@
 'use strict'
 const app = require('../app')
 // eslint-disable-next-line camelcase
-const { envPort, endpoint, dbHost } = require('../config/configurations');
+const { port, endpoint, dbHost } = require('../config/configurations');
 const { Server } = require('socket.io')
 const http = require('http');
 const server = http.createServer(app)
@@ -25,11 +25,11 @@ io.on('connection', onConnection)
 
 
 // Listen to server
-server.listen(envPort, () => {
-  envPort
+server.listen(port, () => {
+  port
     ? console.log(
         // eslint-disable-next-line camelcase
-        `Express server running on port: ${envPort}, endpoint: ${endpoint}, env: ${process.env.NODE_ENV}, db_host: ${dbHost}`
+        `Express server running on port: ${port}, endpoint: ${endpoint}, env: ${process.env.NODE_ENV}, db_host: ${dbHost}`
       )
     : console.log('Error connecting to server!')
 });
