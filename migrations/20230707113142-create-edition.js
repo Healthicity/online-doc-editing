@@ -45,5 +45,3 @@ module.exports = {
     await queryInterface.dropTable('Editions');
   }
 };
-
-// 20230707113216

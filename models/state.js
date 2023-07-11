@@ -1,25 +1,52 @@
 'use strict';
-const {
-  Model
-} = require('sequelize');
-module.exports = (sequelize, DataTypes) => {
-  class State extends Model {
-    /**
-     * Helper method for defining associations.
-     * This method is not a part of Sequelize lifecycle.
-     * The `models/index` file will call this method automatically.
-     */
-    static associate(models) {
-      // define association here
-    }
+const { Model, DataTypes } = require('sequelize');
+const sequelize = require('../config/db-connection');
+
+class State extends Model {
+  static associate(models) {
+    State.hasMany(models.DocumentDraft);
+    State.hasMany(models.DocumentDraft);
   }
 
-  State.statics.findByState = async function (states) {
+  static findByState(states) {
     states = states.map(st => new RegExp(st, 'i'))
-    const data = await this.find({ state: { $in: states } }, '_id')
+    const data =  this.findAll({ where: { state: { id: states } }})
     return data.map(doc => doc.id)
   }
+}
 
+State.init(
+  {
+    id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      primaryKey: true,
+      autoIncrement: true,
+    },
+    state: {
+      type: DataTypes.STRING,
+    },
+    code: {
+      type: DataTypes.INTEGER,
+    },
+    description: {
+      type: DataTypes.TEXT,
+    },
+    createdAt: {
+      type: DataTypes.DATE,
+      allowNull: false,
+      defaultValue: DataTypes.NOW,
+    },
+    updatedAt: {
+      type: DataTypes.DATE,
+      allowNull: false,
+      defaultValue: DataTypes.NOW,
+    },
+  },
+  {
+    sequelize,
+    modelName: 'State',
+  }
+);
 
-  return State;
-};
+module.exports = State;

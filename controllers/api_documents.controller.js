@@ -95,7 +95,7 @@ class Document {
       ]
 
       // const totalCount = await DocumentDraftModel.countDocuments({ stateId: { $in: stateIds }})
-      const totalCount = await DocumentDraftModel.aggregate(aggregatorOpts).exec()
+      const totalCount = Array(10); //await DocumentDraftModel.aggregate(aggregatorOpts).exec()
       // const result = await DocumentDraftModel.populate(totalCount, {path: '_id'})
       // console.log(totalCount);
       if (totalCount.length === 0) return next(handleError(404, 'There are no editing documents in the database!'))
@@ -129,7 +129,7 @@ class Document {
 
   static async lastDocumentUploads(req, res, next) {
     try {
-      const lastUploads = await DocumentModel.find({}, '-content -body').sort({ createdAt: 'desc' }).limit(Document.limit)
+      const lastUploads = await DocumentModel.findAll({ order: [['createdAt', 'DESC']], limit: Document.limit});
 
       if (!lastUploads.length) {
         return next(handleError(404, 'Documents were not found!'))
