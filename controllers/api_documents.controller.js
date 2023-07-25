@@ -98,7 +98,10 @@ class Document {
       const totalCount = await DocumentDraftModel.aggregate(aggregatorOpts).exec()
       // const result = await DocumentDraftModel.populate(totalCount, {path: '_id'})
       // console.log(totalCount);
-      if (totalCount.length === 0) return next(handleError(404, 'There are no editing documents in the database!'))
+      if (totalCount.length === 0) {
+        return res.status(200).send([])
+      }
+      // if (totalCount.length === 0) return next(handleError(404, 'There are no editing documents in the database!'))
 
       return res.status(200).send(totalCount)
     } catch (error) {
@@ -132,7 +135,8 @@ class Document {
       const lastUploads = await DocumentModel.find({}, '-content -body').sort({ createdAt: 'desc' }).limit(Document.limit)
 
       if (!lastUploads.length) {
-        return next(handleError(404, 'Documents were not found!'))
+        return res.status(200).send({ totalCount: 0, documents: [] })
+        // return next(handleError(404, 'Documents were not found!'))
       }
 
       return res.status(200).send({
