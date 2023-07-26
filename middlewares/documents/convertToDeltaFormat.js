@@ -8,7 +8,7 @@ const StateModel = require('../../models/state.model')
 
 let s3File = {}
 
-const convertToHtml = (filename, extension) => through2({ objectMode: true }, async function (chunk, enc, done) {
+const convertToHtml = (filename, extension, cb = () => null) => through2({ objectMode: true }, async function (chunk, enc, done) {
   try {
     const html = await mammoth.convertToHtml({ buffer: chunk })
     const delta = await getDeltaFromHtml(html.value)
@@ -30,7 +30,19 @@ const convertToHtml = (filename, extension) => through2({ objectMode: true }, as
     const documentSaved = await newDocument.save()
 
     // Get state ids
-    const waitingStateId = await StateModel.findByState(['Waiting'])
+    let waitingStateId = await StateModel.findByState(['Waiting'])
+
+    if (!waitingStateId.length) {
+      const newState = new StateModel({
+        state: 'waiting',
+        description: 'A description of this state',
+        code: '01'
+      });
+
+      await newState.save();
+
+      waitingStateId.push(newState.id)
+    }
 
     const newDocumentDraft = new DocumentDraftModel({
       bucket: process.env.S3_BUCKET,
@@ -46,6 +58,9 @@ const convertToHtml = (filename, extension) => through2({ objectMode: true }, as
     })
 
     await newDocumentDraft.save()
+
+    // Remove local upload file from disk
+    cb()
 
     done(null, JSON.stringify({ data: s3File.Location, message: `File ${filename} was successfully uploaded!` }))
   } catch (error) {
