@@ -6,9 +6,11 @@ const Validator = require('../middlewares/validator')
 const mimeTypes = require('mime-types')
 const fileExtensionFilter = require('../middlewares/fileExtensionFilter')
 
-// Local storege when upload file
+// Local storage when upload file
 const storage = multer.diskStorage({
-  destination: 'uploads/',
+  destination: function (req, file, cb) {
+    cb(null, './uploads')
+  },
   filename: function (req, file, cb) {
     cb(null, file.originalname.split('.').slice(0, -1).join('.') + '.' + mimeTypes.extension(file.mimetype))
   }
