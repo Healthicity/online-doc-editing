@@ -222,7 +222,7 @@ class S3Bucket {
     const { bucketName } = req.body
 
     const fileType = await FileType.fromFile(filePath)
-    const newFilename = originalname.split('.').slice(0, -1).join('.') + '.' + fileType.ext
+    const newFilename = originalname.split('.').slice(0, -1).join('.') + '.' + fileType.ext;
 
     try {
       // Validate if the uploaded filename exist in bucket
@@ -246,11 +246,8 @@ class S3Bucket {
           return res.send(err)
         })
           .pipe(uploadToS3(s3, bucketName, newFilename))
-          .pipe(convertToHtml(newFilename, fileType.ext))
+          .pipe(convertToHtml(newFilename, fileType.ext, () => fsPromises.unlink(filePath)))
           .pipe(res.status(201))
-
-        // Remove local upload file from disk
-        await fsPromises.unlink(filePath)
       } catch (error) { // If something occurrs uploading the new file
         const { statusCode, message, name } = error
         // Return an error
