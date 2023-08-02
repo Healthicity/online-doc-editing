@@ -4,6 +4,9 @@ const DraftDocumentModel = require('../models/document_draft.model')
 const DocumentVersionModel = require('../models/document_version.model')
 // const EditionModel = require('../models/edition.model')
 
+const { getHtmlFromDelta } = require('../middlewares/quillConversion')
+const HTMLtoDOCX = require('html-docx-js')
+
 const OnlineUsers = require('../util/onlineUsers')
 const onlineUsers = new OnlineUsers()
 const OnlineDocument = require('../util/onlineDocument')
@@ -146,14 +149,23 @@ module.exports = (io, socket) => {
       // Get draft document by id from database
         const draftDocument = await DraftDocumentModel.findById(draftId, 'filename etag lastModified body content documentId')
 
+        const html = await getHtmlFromDelta(draftDocument.body)
+        const docxFile = HTMLtoDOCX.asBlob(html)
+
         // Upload new version of same filename to bucket
         const data = await s3
           .putObject({
             Bucket: process.env.S3_BUCKET,
             Key: draftDocument.filename,
-            Body: draftDocument.content
+            Body: docxFile
           })
           .promise()
+
+        await DraftDocumentModel.findByIdAndUpdate(draftId, {
+          $set: {
+            content: docxFile
+          }
+        })
 
         // If data do not have a location prop return an error
         if (data === null || !Object.keys(data).length) {
