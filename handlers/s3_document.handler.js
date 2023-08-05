@@ -57,7 +57,6 @@ module.exports = (io, socket) => {
 
       // Convert to Quill Delta object from the HTML data
       const delta = await getDeltaFromHtml(html.value)
-      console.log(delta)
 
       // Map through document versions to return a custom object version array
       const filterVersions = Versions.map(version => {
