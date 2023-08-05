@@ -77,11 +77,10 @@ module.exports = (io, socket) => {
     if (documentId === null) return
 
     const [latestVersion] = await DocumentVersionModel.find({ documentId: documentId }, 'etag versionId body createdAt updatedAt').sort({ createdAt: -1 }).limit(1)
-    console.log(latestVersion)
     if (!latestVersion) {
       // Call s3 function to get one specific object
       const data = await s3
-        .getObject({ Bucket: process.env.S3_BUCKET, Key: draftDocument.filename })
+        .getObject({ Bucket: process.env.S3_BUCKET, Key: draftDocument.path })
         .promise()
 
       // If data do not have a location prop return an error
@@ -89,7 +88,6 @@ module.exports = (io, socket) => {
         throw new Error('No data version')
       }
       const etag = data.ETag.substring(1, data.ETag.length - 1)
-      console.log(data)
 
       const newDocumentVersion = new DocumentVersionModel({
         etag: etag,
@@ -103,7 +101,6 @@ module.exports = (io, socket) => {
       const versionSaved = await newDocumentVersion.save()
       onlineDoc.addDocument(draftId, draftDocument.filename, versionSaved)
     } else {
-      console.log(latestVersion)
       onlineDoc.addDocument(draftId, draftDocument.filename, latestVersion)
     }
   }
@@ -156,7 +153,7 @@ module.exports = (io, socket) => {
         const data = await s3
           .putObject({
             Bucket: process.env.S3_BUCKET,
-            Key: draftDocument.filename,
+            Key: draftDocument.path,
             Body: docxFile
           })
           .promise()
@@ -172,7 +169,6 @@ module.exports = (io, socket) => {
           throw new Error('No data version')
         }
         const etag = data.ETag.substring(1, data.ETag.length - 1)
-        console.log(data)
 
         const newDocumentVersion = new DocumentVersionModel({
           etag: etag,
