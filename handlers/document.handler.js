@@ -222,7 +222,7 @@ module.exports = (io, socket) => {
     console.log(socket.id, 'disconnected')
     const removedUser = onlineUsers.removeUser(socket.id)
     // console.log(removedUser.room)
-    io.emit('documents:getOnlineUsers', onlineUsers.getUserList(removedUser.room))
-    io.to(removedUser.room).emit('documents:removeCursor', removedUser)
+    io.emit('documents:getOnlineUsers', onlineUsers.getUserList(removedUser?.room))
+    io.to(removedUser?.room).emit('documents:removeCursor', removedUser)
   })
 }

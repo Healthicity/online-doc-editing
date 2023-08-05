@@ -6,7 +6,7 @@ const getVersionsByObject = require('../middlewares/getVersionsByObject')
 const fs = require('fs')
 const FileType = require('file-type')
 const handleError = require('../middlewares/handleError')
-const { convertToHtml, uploadToS3 } = require('../middlewares/documents/convertToDeltaFormat')
+const { convertToHtml, uploadToS3, bufferToDelta } = require('../middlewares/documents/convertToDeltaFormat')
 const fsPromises = require('fs/promises')
 
 class S3Bucket {
@@ -246,11 +246,8 @@ class S3Bucket {
           return res.send(err)
         })
           .pipe(uploadToS3(s3, bucketName, newFilename))
-          .pipe(convertToHtml(newFilename, fileType.ext))
+          .pipe(convertToHtml(newFilename, fileType.ext, () => fsPromises.unlink(filePath)))
           .pipe(res.status(201))
-
-        // Remove local upload file from disk
-        await fsPromises.unlink(filePath)
       } catch (error) { // If something occurrs uploading the new file
         const { statusCode, message, name } = error
         // Return an error
@@ -373,6 +370,49 @@ class S3Bucket {
         friendlyMessage: `An error occured restoring the document: ${key} with versionId: ${versionId}`,
         errorName: name
       })
+    }
+  }
+
+  static async checkFile (bucketName, originalname) {
+    try {
+      return await s3.headObject({ Bucket: bucketName, Key: originalname }).promise()
+    } catch (err) {
+      return false
+    }
+  }
+
+  /**
+   * Upload file in S3
+   */
+  static async upFile (req, res, next) {
+    const { originalname, path } = req.file
+    const { bucketName } = req.body
+
+    try {
+      const exists = await S3Bucket.checkFile(bucketName, originalname)
+
+      if (exists) {
+        fs.unlinkSync(path)
+
+        return next(handleError(400, `A file with name: ${originalname} already exists!`))
+      }
+
+      const s3Object = await s3.upload({
+        Bucket: bucketName,
+        Key: originalname,
+        Body: fs.createReadStream(path)
+      }).promise()
+
+      const fileType = await FileType.fromFile(path)
+      const buffer = fs.readFileSync(path)
+
+      await bufferToDelta(originalname, fileType.ext, buffer, s3Object)
+
+      fs.unlinkSync(path)
+
+      return res.status(201).send({ message: 'File uploaded' })
+    } catch (err) {
+      return res.status(500).send({ message: 'Error uploading file', error: err })
     }
   }
 }
