@@ -144,7 +144,7 @@ module.exports = (io, socket) => {
       // SAVE NEW VERSION IN DATABASE
       try {
       // Get draft document by id from database
-        const draftDocument = await DraftDocumentModel.findById(draftId, 'filename etag lastModified body content documentId')
+        const draftDocument = await DraftDocumentModel.findById(draftId, 'filename etag lastModified body content documentId path')
 
         const html = await getHtmlFromDelta(draftDocument.body)
         const docxFile = HTMLtoDOCX.asBlob(html)
@@ -184,7 +184,7 @@ module.exports = (io, socket) => {
 
         onlineDoc.updateDoc(newDocumentVersion)
       } catch (error) {
-        console.log('An error occured in saveDocumentContent method')
+        console.log('An error occured in saveNewDocumentVersion method')
         console.log(error.message)
         return error
       }
