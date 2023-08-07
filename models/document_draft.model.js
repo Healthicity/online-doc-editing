@@ -7,8 +7,8 @@ const DocumentSchema = require('./document.model')
 const DocumentDraft = new Schema({
   _id: { type: Types.ObjectId, auto: true },
   bucket: String,
-  filename: { type: String, unique: true },
-  path: String,
+  filename: String,
+  path: { type: String, unique: true },
   content: Buffer,
   body: Object,
   extension: String,
