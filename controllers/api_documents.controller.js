@@ -5,8 +5,9 @@ const DocumentDraftModel = require('../models/document_draft.model')
 const StateModel = require('../models/state.model')
 const DocumentVersionModel = require('../models/document_version.model')
 const fs = require('fs')
-const s3 = require('../util/s3')
 const mammoth = require('mammoth')
+const filePath = require('path')
+const s3 = require('../util/s3')
 const { getDeltaFromHtml } = require('../middlewares/quillConversion')
 
 class Document {
@@ -37,7 +38,7 @@ class Document {
         if (err) throw err;
       });
       
-      fs.writeFileSync(path, data.Body, 'binary')
+      fs.writeFileSync(filePath.resolve(path), data.Body, 'binary')
       const fileData = fs.readFileSync(path, 'binary')
 
       // Convert to HTML the DOCX file buffer
