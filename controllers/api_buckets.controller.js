@@ -413,7 +413,7 @@ class S3Bucket {
 
       return res.status(201).send({ message: 'File uploaded' })
     } catch (err) {
-      return res.status(500).send({ message: 'Error uploading file', error: err })
+      return next(handleError(err.statusCode || 500, err.message || 'Error uploading file'))
     }
   }
 }

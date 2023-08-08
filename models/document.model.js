@@ -8,6 +8,7 @@ const Document = new Schema({
   path: String,
   content: Buffer,
   body: Object,
+  html: String,
   extension: String,
   lastModified: Date,
   contentLength: Number,

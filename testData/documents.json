@@ -2,7 +2,7 @@
   "_id": {
     "$oid": "60db5ea75c513745c0ab1bf6"
   },
-  "bucket": "doc-api-bucket",
+  "bucket": "document-editor-develop",
   "filename": "DOC API Project.docx",
   "path": "DOC API Project.docx",
   "content": {
@@ -93,7 +93,7 @@
   "_id": {
     "$oid": "60e75f9f050d1e213073ed9f"
   },
-  "bucket": "doc-api-bucket",
+  "bucket": "document-editor-develop",
   "filename": "DOC API Project.docx",
   "path": "DOC API Project.docx",
   "content": {
@@ -274,7 +274,7 @@
   "_id": {
     "$oid": "60db5c125c513745c0ab1bf5"
   },
-  "bucket": "doc-api-bucket",
+  "bucket": "document-editor-develop",
   "filename": "DOC API Project.docx",
   "path": "Content Info Globalesm Website.docx",
   "content": {
@@ -1735,7 +1735,7 @@
   "_id": {
     "$oid": "60db60195c513745c0ab1bf8"
   },
-  "bucket": "doc-api-bucket",
+  "bucket": "document-editor-develop",
   "filename": "DOC API Project.docx",
   "path": "DOC API Project.docx",
   "content": {
@@ -1913,7 +1913,7 @@
   "_id": {
     "$oid": "60db5f655c513745c0ab1bf7"
   },
-  "bucket": "doc-api-bucket",
+  "bucket": "document-editor-develop",
   "filename": "DOC API Project.docx",
   "path": "DOC API Project.docx",
   "content": {
@@ -2085,7 +2085,7 @@
   "_id": {
     "$oid": "60f0597648d57b155ccc8e9d"
   },
-  "bucket": "doc-api-bucket",
+  "bucket": "document-editor-develop",
   "filename": "DOC API Project.docx",
   "path": "DOC API Project.docx",
   "content": {
@@ -2172,7 +2172,7 @@
   "_id": {
     "$oid": "60e76596bfcb95272c69dc89"
   },
-  "bucket": "doc-api-bucket",
+  "bucket": "document-editor-develop",
   "filename": "Loom test video.docx",
   "path": "Loom test video.docx",
   "content": {
@@ -2210,7 +2210,7 @@
   "_id": {
     "$oid": "611184f484019800d294d088"
   },
-  "bucket": "doc-api-bucket",
+  "bucket": "document-editor-develop",
   "filename": "Content Info Globalesm Website.docx",
   "path": "Content Info Globalesm Website.docx",
   "content": {
@@ -2927,7 +2927,7 @@
   "_id": {
     "$oid": "62602eba2a30167e462bbe40"
   },
-  "bucket": "doc-api-bucket",
+  "bucket": "document-editor-develop",
   "filename": "uploadFileTest.docx",
   "path": "uploadFileTest.docx",
   "body": {
