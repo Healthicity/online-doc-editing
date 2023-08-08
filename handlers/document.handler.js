@@ -1,8 +1,9 @@
 'use strict'
-
+const HTMLtoDOCX = require('html-to-docx')
 const DraftDocumentModel = require('../models/document_draft.model')
 const DocumentVersionModel = require('../models/document_version.model')
 // const EditionModel = require('../models/edition.model')
+const { getDeltaFromHtml, getHtmlFromDelta } = require('../middlewares/quillConversion')
 
 const { getHtmlFromDelta } = require('../middlewares/quillConversion')
 const HTMLtoDOCX = require('html-docx-js')
@@ -25,8 +26,6 @@ module.exports = (io, socket) => {
         .populate('stateId')
         .populate('users')
 
-      // console.log(draftDocument)
-
       if (!draftDocument) {
         throw new Error(`No draft document with id: ${draftId}`)
       }
@@ -44,15 +43,17 @@ module.exports = (io, socket) => {
       io.to(draftId).emit('documents:getOnlineUsers', onlineUsers.getUserList(draftId))
 
       // Send updated changes
-      socket.on('documents:sendDraftChanges', async (delta, oldDelta, data) => {
+      socket.on('documents:sendDraftChanges', async (delta, html) => {
         // onlineDoc.updateDoc(oldDelta, data)
+        delta = delta || await getDeltaFromHtml(html)
+        html = html || await getHtmlFromDelta(delta)
 
         // Sets a modifier for a subsequent event emission that the
         // event data will only be broadcast to every sockets that
         // join the 'tag' room but the sender.
-        socket.broadcast.to(draftId).emit('documents:receiveDraftChanges', delta)
+        socket.broadcast.to(draftId).emit('documents:receiveDraftChanges', delta, html)
         // io.to(draftId).emit('documents:receiveSavedDocument', socket.id, 'Saved changes!')
-        saveDocumentContent(draftId, data)
+        saveDocumentContent(draftId, delta, html)
       })
 
       socket.on('documents:cursorChange', (id, range) => {
@@ -64,16 +65,15 @@ module.exports = (io, socket) => {
       //   saveNewDocumentVersion(draftId, body)
       // })
 
-      socket.on('documents:saveNewVersion', saveNewDocumentVersion) // Save document when editor text changed
+      socket.on('documents:saveNewVersion', saveNewDocumentVersion(draftId)) // Save document when editor text changed
     } catch (error) {
-      console.log('An error occured in getDraftDocumentById method')
-      console.log(error.message)
+      console.error('An error occured in getDraftDocumentById method')
+      console.error(error.message)
       return error
     }
   }
 
   const findOrCreateVersion = async (documentId, draftDocument, draftId) => {
-    console.log(typeof documentId)
     if (documentId === null) return
 
     const [latestVersion] = await DocumentVersionModel.find({ documentId: documentId }, 'etag versionId body createdAt updatedAt').sort({ createdAt: -1 }).limit(1)
@@ -94,6 +94,7 @@ module.exports = (io, socket) => {
         lastModified: data.LastModified,
         content: data.Body,
         body: draftDocument.body,
+        html: draftDocument.html,
         documentId: documentId,
         versionId: data.VersionId
       })
@@ -105,14 +106,24 @@ module.exports = (io, socket) => {
     }
   }
 
-  const saveDocumentContent = async (draftId, body) => {
-    if (body === null || !Object.keys(body).length) return
+  const saveDocumentContent = async (draftId, delta, html) => {
+    if (!delta || !html) return
+
+    const data = html || await getHtmlFromDelta(delta)
+
+    const buffer = await HTMLtoDOCX(data, null, {
+      table: { row: { cantSplit: true } },
+      font: 'Helvetica',
+      fontSize: 28
+    })
 
     try {
       console.log('saving document...')
       await DraftDocumentModel.findByIdAndUpdate(draftId, {
         $set: {
-          body: body
+          body: delta,
+          content: buffer,
+          html
         }
       })
       const currentUser = onlineUsers.getUser(socket.id)
@@ -124,22 +135,21 @@ module.exports = (io, socket) => {
       // // Save a new version of the document draft
       // saveNewDocumentVersion(draftId, body)
     } catch (error) {
-      console.log('An error occured in saveDocumentContent method')
-      console.log(error.message)
+      console.error('An error occured in saveDocumentContent method')
+      console.error(error.message)
       return error
     }
   }
   // TODO:
   // Compare delta body to delta body from the latest version stored in database.
-  const saveNewDocumentVersion = async (draftId, currentDelta) => {
+  const saveNewDocumentVersion = (draftId) => async (delta, html) => {
     if (draftId === null) return
 
-    // console.log(onlineDoc.getDocument().latestVersion.body)
-    // console.log(currentDelta)
-    const isSameDelta = util.isDeepStrictEqual(onlineDoc.getDocument().latestVersion.body, currentDelta)
-    // console.log(isSameDelta)
+    const isSameData = delta
+      ? util.isDeepStrictEqual(onlineDoc.getDocument().latestVersion.body, delta)
+      : util.isDeepStrictEqual(onlineDoc.getDocument().latestVersion.html, html)
 
-    if (!isSameDelta) {
+    if (!isSameData) {
       console.log('Body is different as the latest version')
       // SAVE NEW VERSION IN DATABASE
       try {
@@ -175,6 +185,7 @@ module.exports = (io, socket) => {
           lastModified: new Date(),
           content: draftDocument.content,
           body: draftDocument.body,
+          html,
           documentId: draftDocument.documentId,
           versionId: data.VersionId,
           isLatest: true

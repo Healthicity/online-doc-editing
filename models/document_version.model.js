@@ -11,6 +11,7 @@ const DocumentVersion = new Schema({
   versionId: { type: String, unique: true },
   body: Object,
   content: Buffer,
+  html: String,
   versionName: { type: String, default: '' },
   userId: { type: Types.ObjectId, ref: UserSchema },
   documentId: { type: Types.ObjectId, ref: DocumentSchema },
@@ -26,11 +27,11 @@ const DocumentVersion = new Schema({
 }, { timestamps: true })
 
 DocumentVersion.statics.findByDocId = async function (docId, versionLimit) {
-  return await this.find({ documentId: docId, isLatest: false }, '-body -content').sort({ lastModified: 'desc' }).limit(versionLimit)
+  return await this.find({ documentId: docId, isLatest: false }, '-body -content -html').sort({ lastModified: 'desc' }).limit(versionLimit)
 }
 
 DocumentVersion.statics.findRecentVersions = async function (docId, versionLimit = 200) {
-  return await this.find({ documentId: docId }, 'body lastModified versionId versionName userId')
+  return await this.find({ documentId: docId }, 'lastModified versionId versionName userId')
     .sort({ lastModified: 'desc' })
     .limit(versionLimit)
     .populate('userId')
