@@ -2,7 +2,7 @@
   "_id": {
     "$oid": "62587fb84288f58e681caf15"
   },
-  "bucket": "document-editor-develop",
+  "bucket": "doc-api-bucket",
   "filename": "DOC API Project.docx",
   "path": "DOC API Project.docx",
   "content": {
@@ -112,7 +112,7 @@
   "_id": {
     "$oid": "60e75f9f050d1e213073ed9f"
   },
-  "bucket": "document-editor-develop",
+  "bucket": "doc-api-bucket",
   "filename": "DOC API Project.docx",
   "path": "DOC API Project.docx",
   "content": {
@@ -310,7 +310,7 @@
   "_id": {
     "$oid": "6259a1f9d461884659e295d5"
   },
-  "bucket": "document-editor-develop",
+  "bucket": "doc-api-bucket",
   "filename": "Content Info Globalesm Website.docx",
   "path": "Content Info Globalesm Website.docx",
   "content": {
@@ -1036,7 +1036,7 @@
   "_id": {
     "$oid": "6259aa58d461884659e295dd"
   },
-  "bucket": "document-editor-develop",
+  "bucket": "doc-api-bucket",
   "filename": "Loom test video.docx",
   "path": "Loom test video.docx",
   "content": {
@@ -1088,7 +1088,7 @@
     "$date": "2022-03-30T18:42:54Z"
   }
 }, {
-  "bucket": "document-editor-develop",
+  "bucket": "doc-api-bucket",
   "filename": "uploadFileTest.docx",
   "path": "uploadFileTest.docx",
   "body": {
