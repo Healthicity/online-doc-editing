@@ -34,7 +34,7 @@ class Document {
 
       var directoryPath = path.split('/').slice(0,3).join('/')
       // Save buffer inside a file locally in server temporary
-      fs.mkdir(directoryPath, { recursive: true }, (err) => {
+      fs.mkdir(filePath.resolve(directoryPath), { recursive: true }, (err) => {
         if (err) throw err;
       });
       
