@@ -1,6 +1,6 @@
 'use strict'
 const s3 = require('../util/s3')
-const bucket = 'doc-api-bucket'
+const bucket = process.env.S3_BUCKET;
 
 module.exports = (key) => {
   return new Promise((resolve, reject) => {
