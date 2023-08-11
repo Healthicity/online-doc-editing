@@ -1,7 +1,6 @@
 'use strict'
 const Wlogger = require('../config/winston')
 const s3 = require('../util/s3')
-const filePath = require('path')
 const mime = require('mime-types')
 const getVersionsByObject = require('../middlewares/getVersionsByObject')
 const fs = require('fs')
