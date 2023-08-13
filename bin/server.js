@@ -7,11 +7,25 @@ const mongoConnection = require('../config/mongo-connection')
 const http = require('http')
 const server = http.createServer(app)
 const io = new Server(server, {
+  pingTimeout: 60000,
   cors: {
     origin: new RegExp(process.env.CORS_ORIGIN, "i"),
     methods: ['GET', 'POST']
   }
 })
+const AuthenticationTokenModel = require('../models/authentication_token')
+
+io.use((socket, next) => {
+  const token = socket.handshake.auth.token;
+  AuthenticationTokenModel.findOne({ token: token }).then((authentication_token) => {
+    if(authentication_token?.token == token) {
+      next();
+    } else {
+      socket.disconnect("unauthorized")
+      return next(new Error('authentication error'));
+    }
+  })
+});
 
 // Socket Handlers ------------------------------------
 const registerDocumentHandlers = require('../handlers/document.handler')
