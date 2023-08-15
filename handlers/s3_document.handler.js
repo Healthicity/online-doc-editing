@@ -1,5 +1,5 @@
 'use strict'
-const DocumentModel = require('../models/document.model')
+const DocumentModel = require('../models/document')
 const FileType = require('file-type')
 const s3 = require('../util/s3')
 const mammoth = require('mammoth')

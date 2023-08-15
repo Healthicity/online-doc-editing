@@ -1,8 +1,9 @@
 'use strict'
 const { Schema, model, Types } = require('mongoose')
-const StateSchema = require('./state.model')
-const UserSchema = require('./user.model')
-const DocumentSchema = require('./document.model')
+const StateSchema = require('./state')
+const DocumentSchema = require('./document')
+const User = require('./user')
+const { Op } = require("sequelize");
 
 const DocumentDraft = new Schema({
   _id: { type: Types.ObjectId, auto: true },
@@ -16,9 +17,9 @@ const DocumentDraft = new Schema({
   contentLength: Number,
   etag: String,
   stateId: { type: Schema.Types.ObjectId, ref: StateSchema },
-  users: [{ type: Schema.Types.ObjectId, ref: UserSchema, default: [] }],
   documentId: { type: Types.ObjectId, ref: DocumentSchema },
   userConfirmations: { type: Number, default: 0 },
+  userIds: [Number],
   createdAt: {
     type: Date,
     immutable: true,
@@ -30,4 +31,13 @@ const DocumentDraft = new Schema({
   }
 }, { timestamps: true })
 
+DocumentDraft.methods.populateUsers = async function() {
+  return User.findAll({
+    where: {
+      id: {
+        [Op.in]: this.userIds
+      }
+    }
+  })
+}
 module.exports = model('document_drafts', DocumentDraft)

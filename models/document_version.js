@@ -1,7 +1,7 @@
 'use strict'
 const { Schema, model, Types } = require('mongoose')
-const DocumentSchema = require('./document.model')
-const UserSchema = require('./user.model')
+const DocumentSchema = require('./document')
+const UserSchema = require('./user')
 
 const DocumentVersion = new Schema({
   _id: { type: Types.ObjectId, auto: true },

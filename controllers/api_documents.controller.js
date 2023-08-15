@@ -1,9 +1,9 @@
 'use strict'
 const handleError = require('../middlewares/handleError')
-const DocumentModel = require('../models/document.model')
-const DocumentDraftModel = require('../models/document_draft.model')
-const StateModel = require('../models/state.model')
-const DocumentVersionModel = require('../models/document_version.model')
+const DocumentModel = require('../models/document')
+const DocumentDraftModel = require('../models/document_draft')
+const StateModel = require('../models/state')
+const DocumentVersionModel = require('../models/document_version')
 const fs = require('fs')
 const mammoth = require('mammoth')
 const filePath = require('path')
@@ -87,7 +87,6 @@ class Document {
       const data = await DocumentDraftModel
         .find({ stateId: { $in: stateIds } }, 'bucket filename path userConfirmations stateId users createdAt updatedAt')
         .populate('stateId')
-        .populate('users')
       // console.log(data);
 
       // In case data has length 0
