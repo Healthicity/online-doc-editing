@@ -45,8 +45,6 @@ class UsersOnline {
 
   getUser (id) {
     const user = this.users.find((user) => user.id === id)
-    console.log('user gotted')
-    // console.log(user)
     return user
   }
 

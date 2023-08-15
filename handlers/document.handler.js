@@ -1,8 +1,7 @@
 'use strict'
 
-const DraftDocumentModel = require('../models/document_draft.model')
-const DocumentVersionModel = require('../models/document_version.model')
-// const EditionModel = require('../models/edition.model')
+const DraftDocumentModel = require('../models/document_draft')
+const DocumentVersionModel = require('../models/document_version')
 
 const { getHtmlFromDelta } = require('../middlewares/quillConversion')
 const HTMLtoDOCX = require('html-docx-js')
@@ -23,23 +22,23 @@ module.exports = (io, socket) => {
       // Get draft document by id from database
       const draftDocument = await DraftDocumentModel.findById(draftId)
         .populate('stateId')
-        .populate('users')
-
-      // console.log(draftDocument)
-
+            
       if (!draftDocument) {
         throw new Error(`No draft document with id: ${draftId}`)
       }
 
-      // Make all socket instances join the same room document
+      // Make all socket isnstances join the same room document
       // with the specific tag
       socket.join(draftId)
       onlineUsers.removeUser(socket.id)
       onlineUsers.addUser(socket.id, draftId, draftDocument.filename)
-      // onlineDoc.addDocument(draftId, draftDocument.filename, draftDocument.body, draftDocument.body)
       findOrCreateVersion(draftDocument.documentId.toString(), draftDocument, draftId)
-      // Get draft document
-      socket.emit('documents:getDraftDocument', draftDocument)
+
+      var draftDocumentStringified = draftDocument.toObject();
+      draftDocumentStringified.users = await draftDocument.populateUsers();
+
+      socket.emit('documents:getDraftDocument', draftDocumentStringified)
+
       // Get online users
       io.to(draftId).emit('documents:getOnlineUsers', onlineUsers.getUserList(draftId))
 
@@ -73,7 +72,6 @@ module.exports = (io, socket) => {
   }
 
   const findOrCreateVersion = async (documentId, draftDocument, draftId) => {
-    console.log(typeof documentId)
     if (documentId === null) return
 
     const [latestVersion] = await DocumentVersionModel.find({ documentId: documentId }, 'etag versionId body createdAt updatedAt').sort({ createdAt: -1 }).limit(1)
