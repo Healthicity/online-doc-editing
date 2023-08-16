@@ -5,8 +5,8 @@ const { port, endpoint, db_mongo_host } = require('../config/config-env')
 const { Server } = require('socket.io')
 const mongoConnection = require('../config/mongo-connection')
 const http = require('http')
-var jwt = require('jsonwebtoken');
 const sequelize = require('../config/db-connection');
+const { decryptAccessToken } = require('../util/authorization')
 const server = http.createServer(app)
 const io = new Server(server, {
   pingTimeout: 60000,
@@ -22,10 +22,8 @@ io.use((socket, next) => {
   AuthenticationTokenModel.findOne({ token: auth_token }).then((authentication_token) => {
     if(authentication_token?.token == auth_token) {
       console.log("Authenticated")
-      const access_token = socket.handshake.headers.authorization.split(' ')[1];
-      const payload = jwt.verify(access_token, process.env.JWT_SECRET);
-      socket.data.user_id = payload.user_id;
-      socket.data.document_id = payload.document_id;
+      const payload = decryptAccessToken(socket)
+      socket.data.user_id = payload.platform_user_id
       next();
     } else {
       console.log("Unauthorized")
