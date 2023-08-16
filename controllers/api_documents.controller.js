@@ -214,8 +214,12 @@ class Document {
   static async getSidebarVersionHistory(req, res, next) {
     const {documentId} = req.params
     try {
-      const versions = await DocumentVersionModel.findRecentVersions(documentId, Document.historyLimit)
-      console.log(versions);
+      var versions = await DocumentVersionModel.findRecentVersions(documentId, Document.historyLimit)
+      versions = versions.map(async (version) => {
+        var versionObj = version.toObject();
+        versionObj.userId = await version.populateUser();
+        return versionObj;
+      })
       if (!versions.length) return next(handleError(404, 'Documents were not found!'))
 
       return res.status(200).send({
