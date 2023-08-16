@@ -108,10 +108,13 @@ module.exports = (io, socket) => {
 
     try {
       console.log('saving document...')
-      await DraftDocumentModel.findByIdAndUpdate(draftId, {
-        $set: {
-          body: body
-        }
+      const draftDocument = await DraftDocumentModel.findById(draftId)
+      var userIds = draftDocument.userIds
+      userIds.push(socket.data.user_id)
+      userIds = [...new Set(userIds)]
+      await draftDocument.update({
+        body: body,
+        userIds: userIds
       })
       const currentUser = onlineUsers.getUser(socket.id)
       io.to(draftId).emit('documents:receiveSavedDocument', currentUser, 'Saved changes!')
