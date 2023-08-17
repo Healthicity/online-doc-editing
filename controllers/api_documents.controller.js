@@ -214,13 +214,21 @@ class Document {
   static async getSidebarVersionHistory(req, res, next) {
     const {documentId} = req.params
     try {
-      const versions = await DocumentVersionModel.findRecentVersions(documentId, Document.historyLimit)
-      console.log(versions);
-      if (!versions.length) return next(handleError(404, 'Documents were not found!'))
+      var versions = await DocumentVersionModel.findRecentVersions(documentId, Document.historyLimit)
+      const versionObjs = await Promise.all(
+        versions.map(async (version) => {
+          var versionObj = version.toObject();
+          const user = await version.populateUser();
+          versionObj.user = user[0];
+          return versionObj;
+        })
+      )
+
+      if (!versionObjs.length) return next(handleError(404, 'Documents were not found!'))
 
       return res.status(200).send({
-        totalCount: versions.length,
-        versions: versions
+        totalCount: versionObjs.length,
+        versions: versionObjs
       })
     } catch (error) {
       // Destructure error object

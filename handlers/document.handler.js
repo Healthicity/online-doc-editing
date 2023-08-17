@@ -93,7 +93,8 @@ module.exports = (io, socket) => {
         content: data.Body,
         body: draftDocument.body,
         documentId: documentId,
-        versionId: data.VersionId
+        versionId: data.VersionId,
+        userId: socket.data.user_id
       })
 
       const versionSaved = await newDocumentVersion.save()
@@ -178,7 +179,9 @@ module.exports = (io, socket) => {
           body: draftDocument.body,
           documentId: draftDocument.documentId,
           versionId: data.VersionId,
-          isLatest: true
+          isLatest: true,
+          userId: socket.data.user_id
+
         })
 
         await newDocumentVersion.save()
