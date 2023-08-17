@@ -1,7 +1,8 @@
 'use strict'
 const { Schema, model, Types } = require('mongoose')
 const DocumentSchema = require('./document')
-const UserSchema = require('./user')
+const User = require('./user')
+const { Op } = require("sequelize");
 
 const DocumentVersion = new Schema({
   _id: { type: Types.ObjectId, auto: true },
@@ -39,9 +40,10 @@ DocumentVersion.methods.populateUser = async function() {
   return User.findAll({
     where: {
       id: {
-        [Op.in]: this.userId
+        [Op.in]: [this.userId]
       }
-    }
+    },
+    raw: true
   })
 }
 module.exports = model('document_versions', DocumentVersion)
