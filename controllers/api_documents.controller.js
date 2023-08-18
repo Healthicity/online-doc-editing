@@ -132,7 +132,7 @@ class Document {
 
   static async lastDocumentUploads(req, res, next) {
     try {
-      const lastUploads = await DocumentModel.find({}, '-content -body').sort({ createdAt: 'desc' }).limit(Document.limit)
+      const lastUploads = await DocumentDraftModel.find({}, '-content -body -html').sort({ createdAt: 'desc' }).limit(Document.limit)
 
       if (!lastUploads.length) {
         // return next(handleError(404, 'Documents were not found!'))
