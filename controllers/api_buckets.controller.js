@@ -177,8 +177,8 @@ class S3Bucket {
    */
   static async oneObject (req, res, next) {
     // Get required query params to get one object
-    const { bucket, key, versionId } = req.query
-    // const versionId = req.params.versionId
+    const { key, versionId } = req.query
+    const bucket = process.env.S3_BUCKET
 
     try {
       // Call s3 function to get one specific object
@@ -197,8 +197,12 @@ class S3Bucket {
         })
       }
 
-      // // Return data
-      return res.status(200).send(data)
+      res.set({
+        'Content-Type': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        'Content-Disposition': `attachment; filename="${key}"`
+      })
+
+      res.send(data.Body)
     } catch (error) {
       const { statusCode, message, name } = error
       // Return an error
