@@ -1,0 +1,29 @@
+version: 0.0
+os: linux
+files:
+  - source: '/'
+    destination: /home/centos/Doc-Project-API
+    overwrite: true
+permissions:
+  - object: /
+    pattern: "**"
+    owner: centos
+    group: centos
+    mode: 777
+hooks:  
+  ApplicationStop:
+    - location: scripts/stop_server.sh
+      timeout: 300
+      runas: centos
+  BeforeInstall:
+    - location: scripts/before_install.sh
+      timeout: 300
+      runas: centos
+  Install:
+    - location: scripts/install.sh
+      timeout: 300
+      runas: centos
+  ApplicationStart:
+    - location: scripts/start_server.sh
+      timeout: 300
+      runas: centos

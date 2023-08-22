@@ -1,0 +1,58 @@
+version: 0.2
+
+phases:
+  install:
+    commands:
+      - n 16.20.0
+      - npm install -g pm2
+
+
+  pre_build:
+    commands:
+      - npm install
+
+  build:
+    commands:
+      - echo "Setting environment variables"
+      # Data for sockets
+      - export MONGODB_NAME=$/Doc-Project-API/MONGODB_NAME
+      - export LOCAL_MONGODB_URL=$/Doc-Project-API/LOCAL_MONGODB_URL
+      - export LOCAL_MONGODB_USER=$/Doc-Project-API/USER
+      - export LOCAL_MONGODB_PASS=$/Doc-Project-API/LOCAL_MONGODB_PASS
+      - export LOCAL_API_URL=$/Doc-Project-API/LOCAL_API_URL
+# S3 CREDENTIALS
+      - export S3_BUCKET=$/Doc-Project-API/S3_BUCKET
+      - export ID=$/Doc-Project-API/ID
+      - export SECRET=$/Doc-Project-API/SECRET
+# DocuSign API KEYS
+      - export USER_ID=$/Doc-Project-API/USER_ID
+      - export API_ACCOUNT_ID=$/Doc-Project-API/API_ACCOUNT_ID
+      - export ACCOUNT_BASE_URI=$/Doc-Project-API/ACCOUNT_BASE_URI
+      - export INTEGRATION_KEY=$/Doc-Project-API/INTEGRATION_KEY
+      - export NODE_ENV=$NODE_ENV
+      - export PORT=$PORT
+      # Start the server using PM2
+      - pm2 start ./bin/server.js --name "healthcare-integrations-api" 
+      - sleep 5        # Wait for the server to initialize (adjust the duration as needed)
+      - pm2 stop all    # Terminate the pm2 start command
+
+  post_build:
+    commands:
+      - echo "success"
+
+env:
+  variables:
+    ENV: local
+    AWS_POLL_DELAY_SECONDS: 10
+    AWS_MAX_ATTEMPTS: 300
+
+artifacts:
+  files:
+    - '**/*'
+    - '!node_modules/**' # Exclude the node_modules folder
+    - '!package-lock.json' # Exclude the package-lock.json file
+
+
+cache:
+  paths:
+    - node_modules/
