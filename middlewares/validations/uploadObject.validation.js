@@ -1,13 +1,8 @@
-const Joi = require('joi');
-const dotenv = require('dotenv');
-
-dotenv.config();
-
-const defaultBucketName = process.env.S3_BUCKET || 'doc-api-bucket';
+const Joi = require('joi')
 
 const uploadObjectSchema = Joi.object({
-  bucketName: Joi.string().required().default(defaultBucketName),
-  filename: Joi.string(),
-});
+  bucketName: Joi.string().required().default(process.env.S3_BUCKET),
+  filename: Joi.string()
+})
 
-module.exports = uploadObjectSchema;
+module.exports = uploadObjectSchema

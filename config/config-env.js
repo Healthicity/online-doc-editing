@@ -3,10 +3,7 @@ const dotenv = require('dotenv')
 
 dotenv.config()
 
-
-const env = process.env.NODE_ENV ?? "local";
-
-if (env === 'production') {
+if (process.env.NODE_ENV === 'production') {
   module.exports = {
     endpoint: process.env.PROD_API_URL,
     port: process.env.PORT || '3000',
@@ -18,7 +15,7 @@ if (env === 'production') {
     accessKeyId: process.env.ID,
     secretAccessKey: process.env.SECRET
   }
-} else if (env === 'uat') {
+} else if (process.env.NODE_ENV === 'uat') {
   module.exports = {
     endpoint: process.env.UAT_API_URL,
     port: process.env.PORT || '3000',
@@ -30,7 +27,7 @@ if (env === 'production') {
     accessKeyId: process.env.ID,
     secretAccessKey: process.env.SECRET
   }
-} else if (env === 'dev') {
+} else if (process.env.NODE_ENV === 'dev') {
   module.exports = {
     endpoint: process.env.DEV_API_URL,
     port: process.env.PORT || '3000',
@@ -42,7 +39,7 @@ if (env === 'production') {
     accessKeyId: process.env.ID,
     secretAccessKey: process.env.SECRET
   }
-} else if (env === 'local') {
+} else if (process.env.NODE_ENV === 'local') {
   module.exports = {
     endpoint: process.env.LOCAL_API_URL,
     port: process.env.PORT || '3800',
@@ -54,7 +51,7 @@ if (env === 'production') {
     accessKeyId: process.env.ID,
     secretAccessKey: process.env.SECRET
   }
-} else if (env === 'test') {
+} else if (process.env.NODE_ENV === 'test') {
   module.exports = {
     endpoint: process.env.LOCAL_API_URL,
     port: process.env.PORT || '3000',
