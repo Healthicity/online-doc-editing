@@ -6,34 +6,34 @@ phases:
       - n 16.20.0
       - npm install -g pm2
 
-
   pre_build:
     commands:
       - npm install
 
   build:
     commands:
-      - echo "Setting environment variables"
+      - echo "Retrieving environment variables from AWS Parameter Store"
       # Data for sockets
-      - export MONGODB_NAME=$/Doc-Project-API/MONGODB_NAME
-      - export LOCAL_MONGODB_URL=$/Doc-Project-API/LOCAL_MONGODB_URL
-      - export LOCAL_MONGODB_USER=$/Doc-Project-API/USER
-      - export LOCAL_MONGODB_PASS=$/Doc-Project-API/LOCAL_MONGODB_PASS
-      - export LOCAL_API_URL=$/Doc-Project-API/LOCAL_API_URL
-# S3 CREDENTIALS
-      - export S3_BUCKET=$/Doc-Project-API/S3_BUCKET
-      - export ID=$/Doc-Project-API/ID
-      - export SECRET=$/Doc-Project-API/SECRET
-# DocuSign API KEYS
-      - export USER_ID=$/Doc-Project-API/USER_ID
-      - export API_ACCOUNT_ID=$/Doc-Project-API/API_ACCOUNT_ID
-      - export ACCOUNT_BASE_URI=$/Doc-Project-API/ACCOUNT_BASE_URI
-      - export INTEGRATION_KEY=$/Doc-Project-API/INTEGRATION_KEY
-      - export NODE_ENV=$/Doc-Project-API/NODE_ENV
-      - export PORT=$/Doc-Project-API/PORT
+      - export MONGODB_NAME=$(aws ssm get-parameter --name /Doc-Project-API/MONGODB_NAME --query 'Parameter.Value' --output text)
+      - export LOCAL_MONGODB_URL=$(aws ssm get-parameter --name /Doc-Project-API/LOCAL_MONGODB_URL --query 'Parameter.Value' --output text)
+      - export LOCAL_MONGODB_USER=$(aws ssm get-parameter --name /Doc-Project-API/USER --query 'Parameter.Value' --output text)
+      - export LOCAL_MONGODB_PASS=$(aws ssm get-parameter --name /Doc-Project-API/LOCAL_MONGODB_PASS --query 'Parameter.Value' --output text)
+      - export LOCAL_API_URL=$(aws ssm get-parameter --name /Doc-Project-API/LOCAL_API_URL --query 'Parameter.Value' --output text)
+      # S3 CREDENTIALS
+      - export S3_BUCKET=$(aws ssm get-parameter --name /Doc-Project-API/S3_BUCKET --query 'Parameter.Value' --output text)
+      - export ID=$(aws ssm get-parameter --name /Doc-Project-API/ID --query 'Parameter.Value' --output text)
+      - export SECRET=$(aws ssm get-parameter --name /Doc-Project-API/SECRET --query 'Parameter.Value' --output text)
+      # DocuSign API KEYS
+      - export USER_ID=$(aws ssm get-parameter --name /Doc-Project-API/USER_ID --query 'Parameter.Value' --output text)
+      - export API_ACCOUNT_ID=$(aws ssm get-parameter --name /Doc-Project-API/API_ACCOUNT_ID --query 'Parameter.Value' --output text)
+      - export ACCOUNT_BASE_URI=$(aws ssm get-parameter --name /Doc-Project-API/ACCOUNT_BASE_URI --query 'Parameter.Value' --output text)
+      - export INTEGRATION_KEY=$(aws ssm get-parameter --name /Doc-Project-API/INTEGRATION_KEY --query 'Parameter.Value' --output text)
+      - export NODE_ENV=$(aws ssm get-parameter --name /Doc-Project-API/NODE_ENV --query 'Parameter.Value' --output text)
+      - export PORT=$(aws ssm get-parameter --name /Doc-Project-API/PORT --query 'Parameter.Value' --output text)
+
       # Start the server using PM2
       - pm2 start ./bin/server.js --name "Doc-Project-API" 
-      - sleep 5        # Wait for the server to initialize (adjust the duration as needed)
+      - sleep 60        # Wait for the server to initialize (adjust the duration as needed)
       - pm2 stop all    # Terminate the pm2 start command
 
   post_build:
@@ -45,13 +45,12 @@ env:
     ENV: local
     AWS_POLL_DELAY_SECONDS: 10
     AWS_MAX_ATTEMPTS: 300
-
+    
 artifacts:
   files:
     - '**/*'
     - '!node_modules/**' # Exclude the node_modules folder
     - '!package-lock.json' # Exclude the package-lock.json file
-
 
 cache:
   paths:

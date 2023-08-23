@@ -2,29 +2,24 @@
 
 echo "Setting environment variables"
 
-
-    # Data for sockets
-    export PORT=3800
-    export NODE_ENV=local
+# Data for sockets
+export PORT=$(aws ssm get-parameter --name /Doc-Project-API/PORT --query 'Parameter.Value' --output text)
+export NODE_ENV=$(aws ssm get-parameter --name /Doc-Project-API/NODE_ENV --query 'Parameter.Value' --output text)
 
 # Data for sockets
-    export MONGODB_NAME=docapidb
-    export LOCAL_MONGODB_URL=mongodb+srv://ferh97:BCsSsXO9L5uHg8Ss@cluster0.k01i9.mongodb.net/docapidb?retryWrites=true&w=majority
-    export LOCAL_MONGODB_USER=ferh97
-    export LOCAL_MONGODB_PASS=BCsSsXO9L5uHg8Ss
-    export LOCAL_API_URL=http://localhost:3800
+export MONGODB_NAME=$(aws ssm get-parameter --name /Doc-Project-API/MONGODB_NAME --query 'Parameter.Value' --output text)
+export LOCAL_MONGODB_URL=$(aws ssm get-parameter --name /Doc-Project-API/LOCAL_MONGODB_URL --query 'Parameter.Value' --output text)
+export LOCAL_MONGODB_USER=$(aws ssm get-parameter --name /Doc-Project-API/USER --query 'Parameter.Value' --output text)
+export LOCAL_MONGODB_PASS=$(aws ssm get-parameter --name /Doc-Project-API/LOCAL_MONGODB_PASS --query 'Parameter.Value' --output text)
+export LOCAL_API_URL=$(aws ssm get-parameter --name /Doc-Project-API/LOCAL_API_URL --query 'Parameter.Value' --output text)
 
 # S3 CREDENTIALS
-
-    export S3_BUCKET=doc-api-bucket
-
-
-    export ID=AKIAWKNI5U66RZJK6YPI
-    export SECRET=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
+export S3_BUCKET=$(aws ssm get-parameter --name /Doc-Project-API/S3_BUCKET --query 'Parameter.Value' --output text)
+export ID=$(aws ssm get-parameter --name /Doc-Project-API/ID --query 'Parameter.Value' --output text)
+export SECRET=$(aws ssm get-parameter --name /Doc-Project-API/SECRET --query 'Parameter.Value' --output text)
 
 # DocuSign API KEYS
-
-    export USER_ID=49bb8af6-1f22-4104-906e-84cbb63658bd
-    export API_ACCOUNT_ID=0e286e30-b458-406e-83f9-8fef3e497c5a
-    export ACCOUNT_BASE_URI=https://demo.docusign.net
-    export INTEGRATION_KEY=b03c311e-3375-4eb6-970e-6aebd4b056cb
+export USER_ID=$(aws ssm get-parameter --name /Doc-Project-API/USER_ID --query 'Parameter.Value' --output text)
+export API_ACCOUNT_ID=$(aws ssm get-parameter --name /Doc-Project-API/API_ACCOUNT_ID --query 'Parameter.Value' --output text)
+export ACCOUNT_BASE_URI=$(aws ssm get-parameter --name /Doc-Project-API/ACCOUNT_BASE_URI --query 'Parameter.Value' --output text)
+export INTEGRATION_KEY=$(aws ssm get-parameter --name /Doc-Project-API/INTEGRATION_KEY --query 'Parameter.Value' --output text)
