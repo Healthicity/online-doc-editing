@@ -2,6 +2,8 @@
 
 echo "Setting environment variables"
 
+touch .env
+
 # Data for sockets
 echo PORT=$(aws ssm get-parameter --name /Doc-Project-API/PORT --query 'Parameter.Value' --output text) >> /home/centos/Doc-Project-API/.env
 echo NODE_ENV=$(aws ssm get-parameter --name /Doc-Project-API/NODE_ENV --query 'Parameter.Value' --output text) >> /home/centos/Doc-Project-API/.env
