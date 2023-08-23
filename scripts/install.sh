@@ -1,6 +1,6 @@
 #!/bin/bash
 
-cd /home/ec2-user
+cd /home/centos
 
 # Update the system
 sudo yum update -y
@@ -28,10 +28,10 @@ node -v
 npm -v
 
 # Clear npm cache
-npm cache clean --force
+sudo npm cache clean --force
 
 # Install PM2 globally
-npm install -g pm2
+sudo npm install -g pm2
 
 # Verify PM2 installation
 pm2 -v
@@ -40,4 +40,4 @@ pm2 -v
 sudo ln -s $NVM_DIR/versions/node/$(node -v | cut -c 2-)/bin/pm2 /usr/local/bin/pm2
 
 # Adding PM2 system startup script
-sudo env PATH=$PATH:/usr/local/bin pm2 startup systemd -u ec2-user --hp /home/ec2-user
+sudo env PATH=$PATH:/usr/local/bin pm2 startup systemd -u centos --hp /home/centos
