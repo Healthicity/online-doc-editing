@@ -1,7 +1,7 @@
 const Joi = require('joi')
 
 const uploadObjectSchema = Joi.object({
-  bucketName: Joi.string().required().default(process.env.S3_BUCKET),
+  bucketName: Joi.string().required().default('doc-api-bucket'),
   filename: Joi.string()
 })
 
