@@ -9,7 +9,7 @@ require('dotenv').config();
 const swaggerUI = require('swagger-ui-express');
 const swaggerJsDoc = require('swagger-jsdoc');
 const swaggerOptions = require('./swagger'); // Swagger Api docs config options
-const dovenv = require('dovenv');
+const dotenv = require('dotenv');
 // const path = require('path')
 dotenv.config();
 // Initialize Swagger Docs
