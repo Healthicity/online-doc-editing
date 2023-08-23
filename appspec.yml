@@ -2,32 +2,32 @@ version: 0.0
 os: linux
 files:
   - source: '/'
-    destination: /home/centos/Doc-Project-API
+    destination: /home/ec2-user/Doc-Project-API   # Change the destination path to /home/ec2-user/
     overwrite: true
 permissions:
   - object: /
     pattern: "**"
-    owner: centos
-    group: centos
+    owner: ec2-user   # Change the owner to ec2-user
+    group: ec2-user   # Change the group to ec2-user
     mode: 777
 hooks:  
   ApplicationStop:
     - location: scripts/stop_server.sh
       timeout: 300
-      runas: centos
+      runas: ec2-user   # Change the runas user to ec2-user
   BeforeInstall:
     - location: scripts/before_install.sh
       timeout: 300
-      runas: centos
+      runas: ec2-user   # Change the runas user to ec2-user
   Install:
     - location: scripts/install.sh
       timeout: 300
-      runas: centos
+      runas: ec2-user   # Change the runas user to ec2-user
   AfterInstall:
     - location: scripts/after_install.sh
       timeout: 300
-      runas: centos  
+      runas: ec2-user   # Change the runas user to ec2-user
   ApplicationStart:
     - location: scripts/start_server.sh
       timeout: 300
-      runas: centos
+      runas: ec2-user   # Change the runas user to ec2-user
