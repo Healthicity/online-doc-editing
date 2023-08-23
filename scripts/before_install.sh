@@ -21,9 +21,9 @@ echo "Setting environment variables"
     export INTEGRATION_KEY=$/Doc-Project-API/INTEGRATION_KEY
 
     #env
-    export NODE_ENV=$NODE_ENV
-    export PORT=$PORT
-
+    export NODE_ENV=$/Doc-Project-API/NODE_ENV
+    export PORT=$/Doc-Project-API/PORT 
+    
 LOGS_DIR="/home/centos/Doc-Project-API/logs"
 
 # Check if the logs directory exists

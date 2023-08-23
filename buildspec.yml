@@ -29,10 +29,10 @@ phases:
       - export API_ACCOUNT_ID=$/Doc-Project-API/API_ACCOUNT_ID
       - export ACCOUNT_BASE_URI=$/Doc-Project-API/ACCOUNT_BASE_URI
       - export INTEGRATION_KEY=$/Doc-Project-API/INTEGRATION_KEY
-      - export NODE_ENV=$NODE_ENV
-      - export PORT=$PORT
+      - export NODE_ENV=$/Doc-Project-API/NODE_ENV
+      - export PORT=$/Doc-Project-API/PORT
       # Start the server using PM2
-      - pm2 start ./bin/server.js --name "healthcare-integrations-api" 
+      - pm2 start ./bin/server.js --name "Doc-Project-API" 
       - sleep 5        # Wait for the server to initialize (adjust the duration as needed)
       - pm2 stop all    # Terminate the pm2 start command
 
