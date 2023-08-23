@@ -1,6 +1,6 @@
 const Joi = require('joi')
 
-const defaultBucketName = process.env.S3_BUCKET || 'default-bucket-name';
+const defaultBucketName = process.env.S3_BUCKET || 'doc-api-bucket';
 
 
 const uploadObjectSchema = Joi.object({
