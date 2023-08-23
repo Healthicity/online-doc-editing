@@ -3,6 +3,8 @@ const dotenv = require('dotenv')
 
 dotenv.config()
 
+
+const env = process.env.NODE_ENV ?? 
 if (process.env.NODE_ENV === 'production') {
   module.exports = {
     endpoint: process.env.PROD_API_URL,
