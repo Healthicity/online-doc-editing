@@ -32,8 +32,7 @@ phases:
       - export PORT=$(aws ssm get-parameter --name /Doc-Project-API/PORT --query 'Parameter.Value' --output text)
 
       # Start the server using PM2
-      - pm2 start ./bin/server.js --name "Doc-Project-API" 
-      - pm2 log
+      - pm2 start ./bin/server.js --name "Doc-Project-API" > pm2.log 2>&1
       - sleep 60        # Wait for the server to initialize (adjust the duration as needed)
       - pm2 stop all    # Terminate the pm2 start command
 
