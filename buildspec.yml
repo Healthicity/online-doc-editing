@@ -33,6 +33,7 @@ phases:
 
       # Start the server using PM2
       - pm2 start ./bin/server.js --name "Doc-Project-API" 
+      - pm2 log
       - sleep 60        # Wait for the server to initialize (adjust the duration as needed)
       - pm2 stop all    # Terminate the pm2 start command
 
