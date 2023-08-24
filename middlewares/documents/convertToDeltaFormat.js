@@ -100,4 +100,60 @@ const uploadToS3 = (s3, bucketName, filename) => through2({ objectMode: true }, 
   throw new Error(err.message)
 })
 
-module.exports = { convertToHtml, uploadToS3 }
+const bufferToDelta = async (originalname, extension, buffer, s3Object) => {
+  const etag = s3Object.ETag.substring(1, s3Object.ETag.length - 1)
+
+  try {
+    const html = await mammoth.convertToHtml({ buffer })
+    const delta = await getDeltaFromHtml(html.value)
+
+    const document = new DocumentModel({
+      bucket: process.env.S3_BUCKET,
+      filename: originalname,
+      content: buffer,
+      path: s3Object.Key,
+      extension: extension,
+      body: delta,
+      html: html.value,
+      etag
+    })
+
+    await document.save()
+
+    const waitingStateId = await StateModel.findByState(['Waiting'])
+
+    if (!waitingStateId.length) {
+      const state = new StateModel({
+        state: 'waiting',
+        description: 'A description of this state',
+        code: '01'
+      })
+
+      await state.save()
+
+      waitingStateId.push(state.id)
+    }
+
+    const documentDraft = new DocumentDraftModel({
+      bucket: process.env.S3_BUCKET,
+      filename: originalname,
+      content: buffer,
+      path: s3Object.Key,
+      extension: extension,
+      body: delta,
+      html: html.value,
+      etag: etag,
+      stateId: waitingStateId,
+      users: [],
+      documentId: document._id
+    })
+
+    await documentDraft.save()
+  } catch (err) {
+    console.error('Error creating models when uploading file')
+
+    throw err
+  }
+}
+
+module.exports = { convertToHtml, uploadToS3, bufferToDelta }

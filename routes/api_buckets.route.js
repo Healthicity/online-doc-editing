@@ -8,9 +8,7 @@ const fileExtensionFilter = require('../middlewares/fileExtensionFilter')
 
 // Local storage when upload file
 const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, './uploads')
-  },
+  destination: 'uploads/',
   filename: function (req, file, cb) {
     cb(null, file.originalname.split('.').slice(0, -1).join('.') + '.' + mimeTypes.extension(file.mimetype))
   }
@@ -28,7 +26,7 @@ bucketsRouter.get('/objects/versions', Validator('getObjectsVersions'), bucketsC
 bucketsRouter.get('/objects/versions/one', Validator('getObjectsVersionsId'), bucketsCtrl.oneObject) // Get one specific object
 bucketsRouter.get('/delete-markers', Validator('getDeleteMarkers'), bucketsCtrl.allDeleteMarkers) // Get all delete markers objects
 
-bucketsRouter.post('/object', upload.single('filename'), Validator('postObject'), bucketsCtrl.uploadFile) // Upload a file to a bucket
+bucketsRouter.post('/object', upload.single('filename'), Validator('postObject'), bucketsCtrl.upFile) // Upload a file to a bucket
 // bucketsRouter.put('/update', Validator('putUpdate'), bucketsCtrl.updateObject)
 bucketsRouter.delete('/object', Validator('deleteObject'), bucketsCtrl.deleteObject) // Delete object version
 bucketsRouter.delete('/object/restore', Validator('restoreObject'), bucketsCtrl.restoreObject) // Restore object
