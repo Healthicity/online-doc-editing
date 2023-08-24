@@ -109,10 +109,10 @@ Registered Target: Doc-Project-API – wait until /health responds and status is
 		Compute: Default 3 GB memory, 2vCPU
 		Service Role: Doc-Project-API-Codebuild – must have ssmfullacess for parameter
 Additional Configuration:
-	vpc: vpc-0e9f9f6373e9a58e2
-	subnet: subnet-0256a1d186e030ace – subnet must private w/ nat 
-	Security Group: sg-0c8f812072c9b7619
-Artifacts: KMS S3 encryption
+		vpc: vpc-0e9f9f6373e9a58e2
+		subnet: subnet-0256a1d186e030ace – subnet must private w/ nat 
+		Security Group: sg-0c8f812072c9b7619
+		Artifacts: KMS S3 encryption
 		Buildspec.yml is included in the repository.	
 
 
@@ -121,9 +121,9 @@ Artifacts: KMS S3 encryption
 		Applications: 
 			Create an application or use Doc-Project-App
 			There is a preconfigured deployment configuration
-Compute type:EC2/On-premises
-	Deployment type: In-place
-	Service role: EC2-Codedeploy, or create one with SSM, EC2 and Codeploy 
+			Compute type:EC2/On-premises
+			Deployment type: In-place
+			Service role: EC2-Codedeploy, or create one with SSM, EC2 and Codeploy 
 			Deployment Configuration: All at once
 			Environment Configuration: Amazon EC2 instance – type the ec2 name.
 			Load Balancer: Doc-Project-API-TG		
