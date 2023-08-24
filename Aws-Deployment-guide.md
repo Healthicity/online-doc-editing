@@ -4,7 +4,7 @@
 ## VPC:
 	The VPC used to deployed InAppDoc is vpc-0e9f9f6373e9a58e2 (Claims-Connect-Development)
 	
-	Security Group: default SG assigned to Claims Connect
+	Security Group: sg-0c8f812072c9b7619 (InAppDoc-EC2-SG)
 	
 	Nat: Default assigned. 
 
