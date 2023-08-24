@@ -1,9 +1,6 @@
 # AWS Deployment Guide for deploying InAppDoc
 
 
-# How to deploy InAppDoc
-
-
 ## VPC:
 	The VPC used to deployed InAppDoc is vpc-0e9f9f6373e9a58e2 (Claims-Connect-Development)
 	
