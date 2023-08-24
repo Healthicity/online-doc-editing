@@ -83,8 +83,8 @@ EC2 user data (add cli key/secret):
 		ALB: Doc-Project-API-ALB
 		Listener and rules: HTTPS:3800 
 		Target Group: Doc-Project-API-TG
-			Target type: Instance
-			Protocol: Port: HTTP 3800
+		Target type: Instance
+		Protocol: Port: HTTP 3800
 		Protocol Version: HTTP 1
 		IP Address Type: IPv4
 		VPC: vpc-0e9f9f6373e9a58e2
