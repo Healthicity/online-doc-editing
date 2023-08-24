@@ -1,10 +1,10 @@
 # AWS Deployment Guide for deploying InAppDoc
 
 
-#How to deploy InAppDoc
+# How to deploy InAppDoc
 
 
-##VPC:
+## VPC:
 The VPC used to deployed InAppDoc is vpc-0e9f9f6373e9a58e2 (Claims-Connect-Development)
 
 Security Group: default SG assigned to Claims Connect
@@ -20,8 +20,6 @@ Subnet: The subnet can be public such as subnet-0efb8c8688ee9495c (Claims-Connec
 
 
 EC2 user data (add cli key/secret):
-
-##Copy metadata below
 
 #!/bin/bash
 
