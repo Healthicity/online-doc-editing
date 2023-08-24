@@ -108,12 +108,12 @@ EC2 user data (add cli key/secret):
 		Environment type: Linux EC2
 		Compute: Default 3 GB memory, 2vCPU
 		Service Role: Doc-Project-API-Codebuild – must have ssmfullacess for parameter
-Additional Configuration:
-		vpc: vpc-0e9f9f6373e9a58e2
-		subnet: subnet-0256a1d186e030ace – subnet must private w/ nat 
-		Security Group: sg-0c8f812072c9b7619
-		Artifacts: KMS S3 encryption
-		Buildspec.yml is included in the repository.	
+		Additional Configuration:
+			vpc: vpc-0e9f9f6373e9a58e2
+			subnet: subnet-0256a1d186e030ace – subnet must private w/ nat 
+			Security Group: sg-0c8f812072c9b7619
+			Artifacts: KMS S3 encryption
+			Buildspec.yml is included in the repository.	
 
 
 
