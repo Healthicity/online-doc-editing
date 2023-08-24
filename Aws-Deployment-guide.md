@@ -11,7 +11,7 @@ Security Group: default SG assigned to Claims Connect
 
 Nat: Default assigned. 
 
-Ec2 instance InAppDoc-API / Doc-App-API:
+# Ec2 instance InAppDoc-API / Doc-App-API:
  	AMI: ami-08c191625cfb7ee61
 Subnet: The subnet can be public such as subnet-0efb8c8688ee9495c (Claims-Connect-Development-subnet-public1-us-west-2a) on any availability zone. 
 	IAM Role: EC2-CodeDeploy
@@ -75,9 +75,9 @@ aws configure set default.region us-west-2
 aws configure set output json
 echo "AWS CLI configured successfully."
 
-## metadata ends here
 
-##Application Load Balancer:
+
+# Application Load Balancer:
 
 	Load Balancer:
 		ALB: Doc-Project-API-ALB
@@ -91,14 +91,14 @@ VPC: vpc-0e9f9f6373e9a58e2
 Registered Target: Doc-Project-API – wait until /health responds and status is healthy	
 			Certificate: *.healthicity.com or *.qa.healthicity.com
 
-##Auto Scaling Group:
+# Auto Scaling Group:
 
 	Not yet configured.
 	Build EC2 Template for InAppDoc 
 	Configure ASG to use an ec2 template and set the amount of instances.
 	Configure Lifecycle and ALB Health checks
 
-##CodePipeline
+# CodePipeline
 
 	Source: Select Github v2 then select repository then branch
 
