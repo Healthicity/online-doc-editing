@@ -13,7 +13,7 @@ Nat: Default assigned.
 
 # Ec2 instance InAppDoc-API / Doc-App-API:
  	AMI: ami-08c191625cfb7ee61
-Subnet: The subnet can be public such as subnet-0efb8c8688ee9495c (Claims-Connect-Development-subnet-public1-us-west-2a) on any availability zone. 
+	Subnet: The subnet can be public such as subnet-0efb8c8688ee9495c (Claims-Connect-Development-subnet-public1-us-west-2a) on any availability zone. 
 	IAM Role: EC2-CodeDeploy
 	Security Group: InAppDoc-EC2-SG
 	Encryption: EC2 data storage must be encrypted on deployment.
