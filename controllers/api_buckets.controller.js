@@ -176,6 +176,7 @@ class S3Bucket {
    * @param versionId: A specific object version id
    */
   static async oneObject (req, res, next) {
+    console.log('entre aqui')
     // Get required query params to get one object
     const { key, versionId } = req.query
     const bucket = process.env.S3_BUCKET
