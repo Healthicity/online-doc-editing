@@ -33,12 +33,7 @@ phases:
       - export INTEGRATION_KEY=$(aws ssm get-parameter --name /Doc-Project-API/INTEGRATION_KEY --query 'Parameter.Value' --output text)
       - export NODE_ENV=$(aws ssm get-parameter --name /Doc-Project-API/NODE_ENV --query 'Parameter.Value' --output text)
       - export PORT=$(aws ssm get-parameter --name /Doc-Project-API/PORT --query 'Parameter.Value' --output text)
-      
-      # builds the app
-      - nest build
-      - pwd
-      - ls
-
+    
       # Start the server using PM2
       - pm2 start ./bin/server.js --name "Doc-Project-API" > pm2.log 2>&1
       - sleep 60 # Wait for the server to initialize (adjust the duration as needed)
