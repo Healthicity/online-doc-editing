@@ -78,6 +78,7 @@ EC2 user data (add cli key/secret):
 
 	Load Balancer:
 		ALB: Doc-Project-API-ALB
+  		security group: sg-0dfc931de320c16d9 
 		Listener and rules: HTTPS:3800 
 		Target Group: Doc-Project-API-TG
 		Target type: Instance
