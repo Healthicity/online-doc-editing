@@ -1,6 +1,7 @@
 #!/bin/bash
 echo "Stopping all PM2 managed applications..."
 pm2 stop all
+pm2 delete all
 if [ $? -eq 0 ]
 then
   echo "Successfully stopped all PM2 managed applications."
