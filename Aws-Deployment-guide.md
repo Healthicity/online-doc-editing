@@ -85,12 +85,9 @@ EC2 user data (add cli key/secret):
 		Target Group: Doc-Project-API-TG
 			Target type: Instance
 			Protocol: Port: HTTP 3800
-		Protocol Version: 
-  			HTTP 1
-		IP Address Type: 
-  			IPv4
-		VPC: 
-  			vpc-0e9f9f6373e9a58e2
+		Protocol Version: HTTP 1
+		IP Address Type: IPv4
+		VPC: vpc-0e9f9f6373e9a58e2
 		Registered Target: Doc-Project-API – wait until /health responds and status is healthy	
 		Certificate: *.healthicity.com or *.qa.healthicity.com
 
