@@ -5,11 +5,11 @@
 
 
 ## VPC:
-The VPC used to deployed InAppDoc is vpc-0e9f9f6373e9a58e2 (Claims-Connect-Development)
-
-Security Group: default SG assigned to Claims Connect
-
-Nat: Default assigned. 
+	The VPC used to deployed InAppDoc is vpc-0e9f9f6373e9a58e2 (Claims-Connect-Development)
+	
+	Security Group: default SG assigned to Claims Connect
+	
+	Nat: Default assigned. 
 
 # Ec2 instance InAppDoc-API / Doc-App-API:
  	AMI: ami-08c191625cfb7ee61
