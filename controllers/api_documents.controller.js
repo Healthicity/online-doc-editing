@@ -4,9 +4,7 @@ const DocumentModel = require('../models/document')
 const DocumentDraftModel = require('../models/document_draft')
 const StateModel = require('../models/state')
 const DocumentVersionModel = require('../models/document_version')
-const fs = require('fs')
 const mammoth = require('mammoth')
-const filePath = require('path')
 const s3 = require('../util/s3')
 const { getDeltaFromHtml } = require('../middlewares/quillConversion')
 
@@ -32,17 +30,8 @@ class Document {
       const data = await s3.getObject({ Bucket: document.bucket, Key: document.path }).promise()
 
 
-      var directoryPath = path.split('/').slice(0,3).join('/')
-      // Save buffer inside a file locally in server temporary
-      fs.mkdir(filePath.resolve(directoryPath), { recursive: true }, (err) => {
-        if (err) throw err;
-      });
-      
-      fs.writeFileSync(filePath.resolve(path), data.Body, 'binary')
-      const fileData = fs.readFileSync(path, 'binary')
-
       // Convert to HTML the DOCX file buffer
-      const html = await mammoth.convertToHtml({ buffer: fileData })
+      const html = await mammoth.convertToHtml({ buffer: data.Body })
 
       // Convert to Quill Delta object from the HTML data
       const delta = await getDeltaFromHtml(html.value)
@@ -70,10 +59,9 @@ class Document {
   
       await newDocumentDraft.save()
 
-      fs.unlinkSync(path)
-
       return res.status(201).send({ status: 'success' })
     } catch (err) {
+      console.log(err)
       return res.status(500).send({ status: 'failed', error: err })
     }
   }
