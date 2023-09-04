@@ -246,7 +246,8 @@ class Document {
 
     try {
       const version = await DocumentVersionModel.findById(versionId, '-content -isLatest -etag')
-      .populate('userId')
+      const user = await version.populateUser();
+      version.user = user[0];
 
       return res.status(200).send(version)
 
