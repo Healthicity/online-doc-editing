@@ -12,6 +12,7 @@ const DocumentDraft = new Schema({
   path: { type: String, unique: true },
   content: Buffer,
   body: Object,
+  html: String,
   extension: String,
   lastModified: Date,
   contentLength: Number,

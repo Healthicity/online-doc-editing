@@ -26,6 +26,10 @@ class Document {
       const { documentId } = req.params;
       console.log(documentId)
       const document = await DocumentModel.findById(documentId, 'filename bucket path etag extension');
+
+      console.log("*********");
+      console.log(document);
+
       const path = document.path;
       const data = await s3.getObject({ Bucket: document.bucket, Key: document.path }).promise()
 
@@ -40,6 +44,7 @@ class Document {
       await DocumentModel.updateOne({ _id: documentId }, { 
         content: data.Body,
         body: delta,
+        html: html.value,
         lastModified: data.LastModified,
         contentLength: data.ContentLength
       });
@@ -51,6 +56,7 @@ class Document {
         path: document.path,
         extension: document.extension,
         body: delta,
+        html: html.value,
         etag: document.etag,
         stateId: waitingStateId,
         users: [],
