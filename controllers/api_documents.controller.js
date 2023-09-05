@@ -6,7 +6,8 @@ const StateModel = require('../models/state')
 const DocumentVersionModel = require('../models/document_version')
 const mammoth = require('mammoth')
 const s3 = require('../util/s3')
-const { getDeltaFromHtml } = require('../middlewares/quillConversion')
+const { getDeltaFromHtml, getHtmlFromDelta } = require('../middlewares/quillConversion')
+const HTMLtoDOCX = require('html-docx-js')
 
 class Document {
   static limit = 30
@@ -20,6 +21,28 @@ class Document {
    * Return a list of all documents that only includes state:
    * Waiting, In-progress (editing mode)
    */
+
+  static async uploadVersion (req, res, next) {
+    try {
+      const { draftId } = req.params;
+      const draftDocument = await DocumentDraftModel.findById(draftId, 'filename etag lastModified body content documentId path')
+
+      const html = await getHtmlFromDelta(draftDocument.body)
+      const docxFile = HTMLtoDOCX.asBlob(html)
+      const data = await s3
+          .putObject({
+            Bucket: process.env.S3_BUCKET,
+            Key: draftDocument.path,
+            Body: docxFile
+          })
+          .promise()
+
+      return res.status(201).send({ status: 'success' })
+    } catch (err) {
+      console.log(err)
+      return res.status(500).send({ status: 'failed', error: err })
+    }
+  }
 
   static async generateTransformedEditorContent (req, res, next) {
     try {
