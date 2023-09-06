@@ -22,7 +22,7 @@ module.exports = (io, socket) => {
       // Get draft document by id from database
       const draftDocument = await DraftDocumentModel.findById(draftId)
         .populate('stateId')
-            
+
       if (!draftDocument) {
         throw new Error(`No draft document with id: ${draftId}`)
       }
@@ -108,7 +108,6 @@ module.exports = (io, socket) => {
   }
 
   const saveDocumentContent = async (draftId, delta, html) => {
-
     if (!delta || !html) return
 
     const data = html || await getHtmlFromDelta(delta)
@@ -214,36 +213,7 @@ module.exports = (io, socket) => {
     }
   }
 
-  // const saveDocumentEdition = async (draftId, currentUser, edition) => {
-  //   if (!currentUser.editionId) return
 
-  //   try {
-  //     const userId = '6254609bade4d556f5b57e42'
-  //     const edition = await EditionModel.findById(currentUser.editionId)
-  //     if (edition) {
-  //       await EditionModel.findByIdAndUpdate(currentUser.editionId, {
-  //         $set: {
-  //           body: edition
-  //         }
-  //       })
-  //     } else {
-  //       const newEdition = new EditionModel({
-  //         documentDraftId: draftId,
-  //         content: null,
-  //         body: edition,
-  //         userId: userId
-  //       })
-
-  //       const editionSaved = await newEdition.save()
-
-  //       onlineUsers.updateUser(currentUser.id, editionSaved._id)
-
-  //       // return editionSaved
-  //     }
-  //   } catch (error) {
-
-  //   }
-  // }
 
   // DOCUMENT LISTENERS ---------------------------------
   socket.on('documents:getDraftDocumentById', getDraftDocumentById) // Get draft document by id
@@ -254,8 +224,7 @@ module.exports = (io, socket) => {
     console.log(`A user has disconnected: ${reason}`);
 
     const removedUser = onlineUsers.removeUser(socket.id)
-    if (!removedUser) return;
-    
+    if (!removedUser) return
     io.emit('documents:getOnlineUsers', onlineUsers.getUserList(removedUser.room))
     io.to(removedUser.room).emit('documents:removeCursor', removedUser)
   })

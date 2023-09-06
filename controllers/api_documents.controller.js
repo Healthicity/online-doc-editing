@@ -252,10 +252,11 @@ class Document {
 
     try {
       const version = await DocumentVersionModel.findById(versionId, '-content -isLatest -etag')
+      var versionObj = version.toObject();
       const user = await version.populateUser();
-      version.user = user[0];
+      versionObj.user = user[0];
 
-      return res.status(200).send(version)
+      return res.status(200).send(versionObj)
 
     } catch (error) {
       // Destructure error object
@@ -264,27 +265,6 @@ class Document {
       return next(handleError(statusCode, `An error occurred retrieving the version: ${versionId}`, message, name))
     }
   }
-
-  
-
-  // static async createDraftDocument (req, res, next) {
-  //   const newData = req.body
-
-  //   try {
-  //     const newDraft = new DocumentDraftModel(newData)
-  //     await newDraft.save()
-  //   } catch (error) {
-  //     // Destructure error object
-  //     const { statusCode, message, name } = error
-  //     // Return an error
-  //     return next({
-  //       status: statusCode,
-  //       apiMessage: message,
-  //       friendlyMessage: 'An error occurred getting the editing documents',
-  //       errorName: name
-  //     })
-  //   }
-  // }
 }
 
 module.exports = Document
