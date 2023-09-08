@@ -1,7 +1,8 @@
 'use strict'
 const { Schema, model, Types } = require('mongoose')
-const DocumentSchema = require('./document.model')
-const UserSchema = require('./user.model')
+const DocumentSchema = require('./document')
+const User = require('./user')
+const { Op } = require("sequelize");
 
 const DocumentVersion = new Schema({
   _id: { type: Types.ObjectId, auto: true },
@@ -13,7 +14,7 @@ const DocumentVersion = new Schema({
   content: Buffer,
   html: String,
   versionName: { type: String, default: '' },
-  userId: { type: Types.ObjectId, ref: UserSchema },
+  userId: Number,
   documentId: { type: Types.ObjectId, ref: DocumentSchema },
   createdAt: {
     type: Date,
@@ -38,6 +39,7 @@ DocumentVersion.statics.findByDocId = async function (docId, versionLimit) {
 // }
 
 DocumentVersion.statics.findRecentVersions = async function (docId, versionLimit = 200) {
+<<<<<<< HEAD:models/document_version.model.js
   return await this.aggregate([
     { $match: { documentId: new Types.ObjectId(docId) } },
     { $lookup: { from: 'users', localField: 'userId', foreignField: 'id', as: 'user' } }
@@ -46,6 +48,21 @@ DocumentVersion.statics.findRecentVersions = async function (docId, versionLimit
     .project('lastModified versionId versionName userId')
     .limit(versionLimit)
     .sort({ lastModified: 'desc' })
+=======
+  return await this.find({ documentId: docId }, 'html lastModified versionId versionName userId')
+    .sort({ lastModified: 'desc' })
+    .limit(versionLimit)
+>>>>>>> 89d9b0bfaa646199bc85ffef9d870b8ca801707d:models/document_version.js
 }
 
+DocumentVersion.methods.populateUser = async function() {
+  return User.findAll({
+    where: {
+      id: {
+        [Op.in]: [this.userId]
+      }
+    },
+    raw: true
+  })
+}
 module.exports = model('document_versions', DocumentVersion)
