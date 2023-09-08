@@ -39,20 +39,9 @@ DocumentVersion.statics.findByDocId = async function (docId, versionLimit) {
 // }
 
 DocumentVersion.statics.findRecentVersions = async function (docId, versionLimit = 200) {
-<<<<<<< HEAD:models/document_version.model.js
-  return await this.aggregate([
-    { $match: { documentId: new Types.ObjectId(docId) } },
-    { $lookup: { from: 'users', localField: 'userId', foreignField: 'id', as: 'user' } }
-  ])
-    .allowDiskUse(true)
-    .project('lastModified versionId versionName userId')
-    .limit(versionLimit)
-    .sort({ lastModified: 'desc' })
-=======
   return await this.find({ documentId: docId }, 'html lastModified versionId versionName userId')
     .sort({ lastModified: 'desc' })
     .limit(versionLimit)
->>>>>>> 89d9b0bfaa646199bc85ffef9d870b8ca801707d:models/document_version.js
 }
 
 DocumentVersion.methods.populateUser = async function() {
