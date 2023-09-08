@@ -114,6 +114,7 @@ const bufferToDelta = async (originalname, extension, buffer, s3Object) => {
       path: s3Object.Key,
       extension: extension,
       body: delta,
+      html: html.value,
       etag
     })
 
@@ -140,6 +141,7 @@ const bufferToDelta = async (originalname, extension, buffer, s3Object) => {
       path: s3Object.Key,
       extension: extension,
       body: delta,
+      html: html.value,
       etag: etag,
       stateId: waitingStateId,
       users: [],

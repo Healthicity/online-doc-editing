@@ -11,7 +11,7 @@ const server = http.createServer(app)
 const io = new Server(server, {
   pingTimeout: 60000,
   cors: {
-    origin: new RegExp(process.env.CORS_ORIGIN, "i"),
+    origin: 'http://localhost:3000',
     methods: ['GET', 'POST']
   }
 })

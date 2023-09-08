@@ -15,6 +15,13 @@ documentsRouter.get('/last-uploads', documentsCtrl.lastDocumentUploads) // Get l
 documentsRouter.get('/one-version/:versionId', Validator('getVersionById'), documentsCtrl.getVersionById)
 
 documentsRouter.put('/version-name/:versionId/', Validator('updateVersionName'), documentsCtrl.updateVersionName)
-documentsRouter.get('/generate-content/:documentId', documentsCtrl.generateTransformedEditorContent)
+// Not used at this moment
+// documentsRouter.get('/count', documentStateFilter, documentsCtrl.countDocuments) // Get total count by document state
+
+// documentsRouter.get('/objects', Validator('getObjects'), documentsCtrl.allObjects) // Get all objects from one bucket
+// documentsRouter.get('/objects/versions', Validator('getObjectsVersions'), documentsCtrl.allObjectVersions) // Get all object versions from one bucket
+// documentsRouter.get('/objects/versions/one', Validator('getObjectsVersionsId'), documentsCtrl.oneObject) // Get one specific object
+// documentsRouter.get('/delete-markers', Validator('getDeleteMarkers'), documentsCtrl.allDeleteMarkers) // Get all delete markers objects
+// documentsRouter.post('/', documentsCtrl.createDraftDocument)
 
 module.exports = documentsRouter

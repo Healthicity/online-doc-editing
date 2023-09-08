@@ -1,5 +1,6 @@
 'use strict'
 const handleError = require('../middlewares/handleError')
+<<<<<<< HEAD
 const DocumentModel = require('../models/document')
 const DocumentDraftModel = require('../models/document_draft')
 const StateModel = require('../models/state')
@@ -9,6 +10,12 @@ const mammoth = require('mammoth')
 const filePath = require('path')
 const s3 = require('../util/s3')
 const { getDeltaFromHtml } = require('../middlewares/quillConversion')
+=======
+const DocumentModel = require('../models/document.model')
+const DocumentDraftModel = require('../models/document_draft.model')
+const StateModel = require('../models/state.model')
+const DocumentVersionModel = require('../models/document_version.model')
+>>>>>>> CM-8563-upload-latest
 
 class Document {
   static limit = 30
@@ -22,62 +29,6 @@ class Document {
    * Return a list of all documents that only includes state:
    * Waiting, In-progress (editing mode)
    */
-
-  static async generateTransformedEditorContent (req, res, next) {
-    try {
-      const { documentId } = req.params;
-      console.log(documentId)
-      const document = await DocumentModel.findById(documentId, 'filename bucket path etag extension');
-      const path = document.path;
-      const data = await s3.getObject({ Bucket: document.bucket, Key: document.path }).promise()
-
-
-      var directoryPath = path.split('/').slice(0,3).join('/')
-      // Save buffer inside a file locally in server temporary
-      fs.mkdir(filePath.resolve(directoryPath), { recursive: true }, (err) => {
-        if (err) throw err;
-      });
-      
-      fs.writeFileSync(filePath.resolve(path), data.Body, 'binary')
-      const fileData = fs.readFileSync(path, 'binary')
-
-      // Convert to HTML the DOCX file buffer
-      const html = await mammoth.convertToHtml({ buffer: fileData })
-
-      // Convert to Quill Delta object from the HTML data
-      const delta = await getDeltaFromHtml(html.value)
-      const waitingStateId = await StateModel.findByState(['Waiting'])
-
-      await DocumentModel.updateOne({ _id: documentId }, { 
-        content: data.Body,
-        body: delta,
-        lastModified: data.LastModified,
-        contentLength: data.ContentLength
-      });
-      
-      const newDocumentDraft = new DocumentDraftModel({
-        bucket: document.bucket,
-        filename: document.filename,
-        content: data.Body,
-        path: document.path,
-        extension: document.extension,
-        body: delta,
-        etag: document.etag,
-        stateId: waitingStateId,
-        users: [],
-        documentId: document._id
-      })
-  
-      await newDocumentDraft.save()
-
-      fs.unlinkSync(path)
-
-      return res.status(201).send({ status: 'success' })
-    } catch (err) {
-      return res.status(500).send({ status: 'failed', error: err })
-    }
-  }
-
   static async getDocumentsByState (req, res, next) {
     try {
       // Get state ids
@@ -158,10 +109,10 @@ class Document {
       const totalCount = await DocumentDraftModel.aggregate(aggregatorOpts).exec()
       // const result = await DocumentDraftModel.populate(totalCount, {path: '_id'})
       // console.log(totalCount);
+      // if (totalCount.length === 0) return next(handleError(404, 'There are no editing documents in the database!'))
       if (totalCount.length === 0) {
         return res.status(200).send([])
       }
-      // if (totalCount.length === 0) return next(handleError(404, 'There are no editing documents in the database!'))
 
       return res.status(200).send(totalCount)
     } catch (error) {
@@ -192,11 +143,11 @@ class Document {
 
   static async lastDocumentUploads(req, res, next) {
     try {
-      const lastUploads = await DocumentModel.find({}, '-content -body').sort({ createdAt: 'desc' }).limit(Document.limit)
+      const lastUploads = await DocumentDraftModel.find({}, '-content -body -html').sort({ createdAt: 'desc' }).limit(Document.limit)
 
       if (!lastUploads.length) {
-        return res.status(200).send({ totalCount: 0, documents: [] })
         // return next(handleError(404, 'Documents were not found!'))
+        return res.status(200).send({ totalCount: 0, documents: [] })
       }
 
       return res.status(200).send({
