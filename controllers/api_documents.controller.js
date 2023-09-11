@@ -58,6 +58,13 @@ class Document {
 
       await newDocumentVersion.save()
 
+      await DocumentModel.findByIdAndUpdate(draftDocument.documentId, {
+        $set: {
+          content: docxFile,
+          html: draftDocument.html
+        }
+      })
+
       onlineDoc.updateDoc(newDocumentVersion)
 
       return res.status(201).send({ status: 'success' })
