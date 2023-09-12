@@ -3,9 +3,9 @@
 
 ## VPC:
 	The VPC used to deployed InAppDoc is vpc-0e9f9f6373e9a58e2 (Claims-Connect-Development)
-	
+
 	Security Group: sg-0c8f812072c9b7619 (InAppDoc-EC2-SG)
-	
+
 	Nat: Default assigned. 
 
 ## Ec2 instance InAppDoc-API / Doc-App-API:
@@ -19,7 +19,6 @@
 EC2 user data (add cli key/secret):
 
 	#!/bin/bash
-	
 	#Install Ruby
 	echo "Installing Ruby..."
 	sudo yum -y update
@@ -28,10 +27,10 @@ EC2 user data (add cli key/secret):
 	sudo yum install -y gcc-c++ make
 	curl -sL https://rpm.nodesource.com/setup_16.x | sudo bash -
 	sudo yum install -y nodejs
-	
+
 	#Install pm2 globally
 	sudo npm install -g pm2
-	
+
 	#Install CodeDeploy agent
 	echo "Installing CodeDeploy agent..."
 	cd /home/centos/
@@ -41,29 +40,28 @@ EC2 user data (add cli key/secret):
 	sudo systemctl enable codedeploy-agent
 	sudo systemctl start codedeploy-agent
 	echo "CodeDeploy agent installed successfully."
-	
+
 	#Install Automox
 	echo "Installing Automox..."
 	curl -sS https://console.automox.com/downloadInstaller?accesskey=748205f4-d7c6-4010-819f-853b3efbbdc6 | sudo bash
-	
+
 	#Verify Automox installation
 	sudo systemctl is-active --quiet amagent
-	
+
 	#Start Automox
 	sudo systemctl start amagent
-	
+
 	#Verify service is running
 	sudo systemctl is-active --quiet amagent
-	
+
 	#Restart Automox
 	sudo systemctl restart amagent
 	echo "Automox installed successfully."
-	
+
 	#Install AWS CLI
 	echo "Installing AWS CLI..."
 	sudo pip3 install awscli
 	echo "AWS CLI installed successfully."
-	
 	#Configure AWS CLI with access keys
 	echo "Configuring AWS CLI..."
 	aws configure set aws_access_key_id YOUR_ACCESS_KEY

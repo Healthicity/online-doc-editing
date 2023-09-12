@@ -1,9 +1,10 @@
 'use strict'
+
 const HTMLtoDOCX = require('html-to-docx')
-const DraftDocumentModel = require('../models/document_draft.model')
-const DocumentVersionModel = require('../models/document_version.model')
-// const EditionModel = require('../models/edition.model')
-const { getDeltaFromHtml, getHtmlFromDelta } = require('../middlewares/quillConversion')
+const DraftDocumentModel = require('../models/document_draft')
+const DocumentVersionModel = require('../models/document_version')
+
+const { getHtmlFromDelta, getDeltaFromHtml } = require('../middlewares/quillConversion')
 
 const OnlineUsers = require('../util/onlineUsers')
 const onlineUsers = new OnlineUsers()
@@ -21,7 +22,6 @@ module.exports = (io, socket) => {
       // Get draft document by id from database
       const draftDocument = await DraftDocumentModel.findById(draftId)
         .populate('stateId')
-        .populate('users')
 
       if (!draftDocument) {
         throw new Error(`No draft document with id: ${draftId}`)
@@ -112,6 +112,21 @@ module.exports = (io, socket) => {
         console.error('An error occurred in getDraftDocumentById method')
         console.log(err)
       }
+      const etag = data.ETag.substring(1, data.ETag.length - 1)
+
+      const newDocumentVersion = new DocumentVersionModel({
+        etag: etag,
+        lastModified: data.LastModified,
+        content: data.Body,
+        body: draftDocument.body,
+        html: draftDocument.html,
+        documentId: documentId,
+        versionId: data.VersionId,
+        userId: socket.data.user_id
+      })
+
+      const versionSaved = await newDocumentVersion.save()
+      onlineDoc.addDocument(draftId, draftDocument.filename, versionSaved)
     } else {
       onlineDoc.addDocument(draftId, draftDocument.filename, latestVersion)
     }
@@ -130,12 +145,16 @@ module.exports = (io, socket) => {
 
     try {
       console.log('saving document...')
-      await DraftDocumentModel.findByIdAndUpdate(draftId, {
-        $set: {
-          body: delta,
-          content: buffer,
-          html
-        }
+      const draftDocument = await DraftDocumentModel.findById(draftId)
+      var userIds = draftDocument.userIds
+      userIds.push(socket.data.user_id)
+      userIds = [...new Set(userIds)]
+      await draftDocument.update({
+        body: delta,
+        content: buffer,
+        userIds: userIds,
+        html,
+
       })
       const currentUser = onlineUsers.getUser(socket.id)
       io.to(draftId).emit('documents:receiveSavedDocument', currentUser, 'Saved changes!') // quizas pueda borrar esta emit
@@ -146,7 +165,7 @@ module.exports = (io, socket) => {
       // // Save a new version of the document draft
       // saveNewDocumentVersion(draftId, body)
     } catch (error) {
-      console.error('An error occurred in saveDocumentContent method')
+      console.error('An error occured in saveDocumentContent method')
       console.error(error.message)
       return error
     }
@@ -156,86 +175,36 @@ module.exports = (io, socket) => {
   const saveNewDocumentVersion = (draftId) => async (delta, html) => {
     if (draftId === null) return
 
+    // console.log(onlineDoc.getDocument().latestVersion.body)
+    // console.log(currentDelta)
     const isSameData = delta
       ? util.isDeepStrictEqual(onlineDoc.getDocument().latestVersion.body, delta)
       : util.isDeepStrictEqual(onlineDoc.getDocument().latestVersion.html, html)
+    // console.log(isSameDelta)
 
     if (!isSameData) {
       console.log('Body is different as the latest version')
       // SAVE NEW VERSION IN DATABASE
       try {
       // Get draft document by id from database
-        const draftDocument = await DraftDocumentModel.findById(draftId, 'filename etag lastModified body content html documentId')
+        const draftDocument = await DraftDocumentModel.findById(draftId, 'filename etag lastModified body content html documentId path')
+        const docxFile = HTMLtoDOCX(draftDocument.html)
 
-        // Upload new version of same filename to bucket
-        const data = await s3
-          .putObject({
-            Bucket: process.env.S3_BUCKET,
-            Key: draftDocument.filename,
-            Body: draftDocument.content
-          })
-          .promise()
-
-        // If data do not have a location prop return an error
-        if (data === null || !Object.keys(data).length) {
-          throw new Error('No data version')
-        }
-        const etag = data.ETag.substring(1, data.ETag.length - 1)
-
-        const newDocumentVersion = new DocumentVersionModel({
-          etag: etag,
-          lastModified: new Date(),
-          content: draftDocument.content,
-          body: draftDocument.body,
-          html,
-          documentId: draftDocument.documentId,
-          versionId: data.VersionId,
-          isLatest: true,
-          userId: socket.data.user_id
-
+        await DraftDocumentModel.findByIdAndUpdate(draftId, {
+          $set: {
+            content: docxFile,
+            html
+          }
         })
-
-        await newDocumentVersion.save()
-
-        onlineDoc.updateDoc(newDocumentVersion)
       } catch (error) {
-        console.error('An error occured in saveDocumentContent method')
+        console.error('An error occured in saveNewDocumentVersion method')
         console.error(error.message)
         return error
       }
     }
   }
 
-  // const saveDocumentEdition = async (draftId, currentUser, edition) => {
-  //   if (!currentUser.editionId) return
 
-  //   try {
-  //     const userId = '6254609bade4d556f5b57e42'
-  //     const edition = await EditionModel.findById(currentUser.editionId)
-  //     if (edition) {
-  //       await EditionModel.findByIdAndUpdate(currentUser.editionId, {
-  //         $set: {
-  //           body: edition
-  //         }
-  //       })
-  //     } else {
-  //       const newEdition = new EditionModel({
-  //         documentDraftId: draftId,
-  //         content: null,
-  //         body: edition,
-  //         userId: userId
-  //       })
-
-  //       const editionSaved = await newEdition.save()
-
-  //       onlineUsers.updateUser(currentUser.id, editionSaved._id)
-
-  //       // return editionSaved
-  //     }
-  //   } catch (error) {
-
-  //   }
-  // }
 
   // DOCUMENT LISTENERS ---------------------------------
   socket.on('documents:getDraftDocumentById', getDraftDocumentById) // Get draft document by id
@@ -244,7 +213,8 @@ module.exports = (io, socket) => {
   socket.on('disconnect', () => {
     console.log(socket.id, 'disconnected')
     const removedUser = onlineUsers.removeUser(socket.id)
-    io.emit('documents:getOnlineUsers', onlineUsers.getUserList(removedUser?.room))
-    io.to(removedUser?.room).emit('documents:removeCursor', removedUser)
+    if (!removedUser) return
+    io.emit('documents:getOnlineUsers', onlineUsers.getUserList(removedUser.room))
+    io.to(removedUser.room).emit('documents:removeCursor', removedUser)
   })
 }

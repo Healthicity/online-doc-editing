@@ -1,3 +1,5 @@
+
+
 {
   "name": "healthcare-integrations-api",
   "version": "1.0.0",
@@ -29,6 +31,7 @@
     "express": "^4.17.3",
     "file-system": "^2.2.2",
     "file-type": "^16.5.3",
+    "html-docx-js": "^0.3.1",
     "html-to-docx": "^1.8.0",
     "http-errors": "^2.0.0",
     "joi": "^17.6.0",
