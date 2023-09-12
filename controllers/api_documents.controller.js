@@ -6,7 +6,10 @@ const StateModel = require('../models/state')
 const DocumentVersionModel = require('../models/document_version')
 const mammoth = require('mammoth')
 const s3 = require('../util/s3')
-const { getDeltaFromHtml } = require('../middlewares/quillConversion')
+const { getDeltaFromHtml, getHtmlFromDelta } = require('../middlewares/quillConversion')
+const HTMLtoDOCX = require('html-docx-js')
+const OnlineDocument = require('../util/onlineDocument')
+const onlineDoc = new OnlineDocument()
 
 class Document {
   static limit = 30
@@ -20,6 +23,56 @@ class Document {
    * Return a list of all documents that only includes state:
    * Waiting, In-progress (editing mode)
    */
+
+  static async uploadVersion (req, res, next) {
+    try {
+      console.log("Here")
+      const { draftId } = req.params;
+      const draftDocument = await DocumentDraftModel.findById(draftId, 'filename etag lastModified body content html documentId path')
+
+      const docxFile = HTMLtoDOCX.asBlob(draftDocument.html)
+      const data = await s3
+          .putObject({
+            Bucket: process.env.S3_BUCKET,
+            Key: draftDocument.path,
+            Body: docxFile
+          })
+          .promise()
+
+      // If data do not have a location prop return an error
+      if (data === null || !Object.keys(data).length) {
+        throw new Error('No data version')
+      }
+      const etag = data.ETag.substring(1, data.ETag.length - 1)
+
+      const newDocumentVersion = new DocumentVersionModel({
+        etag: etag,
+        lastModified: new Date(),
+        content: draftDocument.content,
+        body: draftDocument.body,
+        html: draftDocument.html,
+        documentId: draftDocument.documentId,
+        versionId: data.VersionId,
+        isLatest: true,
+      })
+
+      await newDocumentVersion.save()
+
+      await DocumentModel.findByIdAndUpdate(draftDocument.documentId, {
+        $set: {
+          content: docxFile,
+          html: draftDocument.html
+        }
+      })
+
+      onlineDoc.updateDoc(newDocumentVersion)
+
+      return res.status(201).send({ status: 'success' })
+    } catch (err) {
+      console.log(err)
+      return res.status(500).send({ status: 'failed', error: err })
+    }
+  }
 
   static async generateTransformedEditorContent (req, res, next) {
     try {

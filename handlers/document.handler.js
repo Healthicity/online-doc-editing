@@ -163,18 +163,7 @@ module.exports = (io, socket) => {
       try {
       // Get draft document by id from database
         const draftDocument = await DraftDocumentModel.findById(draftId, 'filename etag lastModified body content html documentId path')
-
-        const html = await getHtmlFromDelta(draftDocument.body)
-        const docxFile = HTMLtoDOCX.asBlob(html)
-
-        // Upload new version of same filename to bucket
-        const data = await s3
-          .putObject({
-            Bucket: process.env.S3_BUCKET,
-            Key: draftDocument.path,
-            Body: docxFile
-          })
-          .promise()
+        const docxFile = HTMLtoDOCX(draftDocument.html)
 
         await DraftDocumentModel.findByIdAndUpdate(draftId, {
           $set: {
@@ -182,29 +171,6 @@ module.exports = (io, socket) => {
             html
           }
         })
-
-        // If data do not have a location prop return an error
-        if (data === null || !Object.keys(data).length) {
-          throw new Error('No data version')
-        }
-        const etag = data.ETag.substring(1, data.ETag.length - 1)
-
-        const newDocumentVersion = new DocumentVersionModel({
-          etag: etag,
-          lastModified: new Date(),
-          content: draftDocument.content,
-          body: draftDocument.body,
-          html,
-          documentId: draftDocument.documentId,
-          versionId: data.VersionId,
-          isLatest: true,
-          userId: socket.data.user_id
-
-        })
-
-        await newDocumentVersion.save()
-
-        onlineDoc.updateDoc(newDocumentVersion)
       } catch (error) {
         console.error('An error occured in saveNewDocumentVersion method')
         console.error(error.message)

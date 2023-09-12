@@ -16,5 +16,6 @@ documentsRouter.get('/one-version/:versionId', Validator('getVersionById'), docu
 
 documentsRouter.put('/version-name/:versionId/', Validator('updateVersionName'), documentsCtrl.updateVersionName)
 documentsRouter.get('/generate-content/:documentId', documentsCtrl.generateTransformedEditorContent)
+documentsRouter.get('/upload-version/:draftId', documentsCtrl.uploadVersion)
 
 module.exports = documentsRouter
