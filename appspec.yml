@@ -22,11 +22,7 @@ hooks:
   Install:
     - location: scripts/install.sh
       timeout: 300
-      runas: centos
-  AfterInstall:
-    - location: scripts/after_install.sh
-      timeout: 300
-      runas: centos  
+      runas: centosgit a
   ApplicationStart:
     - location: scripts/start_server.sh
       timeout: 300
