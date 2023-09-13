@@ -27,7 +27,8 @@ echo ACCOUNT_BASE_URI=$(aws ssm get-parameter --name /Doc-Project-API/ACCOUNT_BA
 echo INTEGRATION_KEY=$(aws ssm get-parameter --name /Doc-Project-API/INTEGRATION_KEY --query 'Parameter.Value' --output text) >> /home/centos/Doc-Project-API/.env
 
 # New parameters
-echo CORS_ORIGIN=$(aws ssm get-parameter --name /Doc-Project-API/CORS_ORIGIN --query 'Parameter.Value' --output text) >> /home/centos/Doc-Proect-API/.env
+echo CORS_ORIGIN=$(aws ssm get-parameter --name /Doc-Project-API/CORS_ORIGIN --query 'Parameter.Value' --output text) >> /home/centos/Doc-Project-API/.env
+
 
 echo JWT_SECRET=$(aws ssm get-parameter --name /Doc-Project-API/JWT_SECRET --query 'Parameter.Value' --output text) >> /home/centos/Doc-Project-API/.env
 echo PLATFORM_DB_NAME=$(aws ssm get-parameter --name /Doc-Project-API/PLATFORM_DB_NAME --query 'Parameter.Value' --output text) >> /home/centos/Doc-Project-API/.env
