@@ -36,5 +36,3 @@ export "PLATFORM_USERNAME=$(aws ssm get-parameter --name /Doc-Project-API/PLATFO
 export "PLATFORM_DB_HOST=$(aws ssm get-parameter --name /Doc-Project-API/PLATFORM_DB_HOST --query 'Parameter.Value' --output text)" >> /home/centos/Doc-Project-API/.env
 export "PLATFORM_DB_DIALECT=$(aws ssm get-parameter --name /Doc-Project-API/PLATFORM_DB_DIALECT --query 'Parameter.Value' --output text)" >> /home/centos/Doc-Project-API/.env
 export "PLATFORM_PASSWORD=$(aws ssm get-parameter --name /Doc-Project-API/PLATFORM_PASSWORD --query 'Parameter.Value' --output text)" >> /home/centos/Doc-Project-API/.env
-
-printenv
