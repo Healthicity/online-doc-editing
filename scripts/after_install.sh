@@ -33,3 +33,11 @@ for param in "${params[@]}"; do
         echo "$param=$value" >> /home/centos/Doc-Project-API/.env
     fi
 done
+
+
+cd /home/centos/Doc-Project-API/scripts
+
+sudo chmod +x after_install.sh
+./after_install.sh
+
+
