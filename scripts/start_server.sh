@@ -5,6 +5,12 @@ set -e
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 
+
+cd /home/centos/Doc-Project-API/scripts
+
+sudo chmod +x after_install.sh
+./after_install.sh
+
 # Verify Node.js and npm installation
 node -v
 npm -v
