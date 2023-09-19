@@ -1,9 +1,15 @@
 'use strict'
 const handleError = require('../middlewares/handleError')
-const DocumentModel = require('../models/document.model')
-const DocumentDraftModel = require('../models/document_draft.model')
-const StateModel = require('../models/state.model')
-const DocumentVersionModel = require('../models/document_version.model')
+const DocumentModel = require('../models/document')
+const DocumentDraftModel = require('../models/document_draft')
+const StateModel = require('../models/state')
+const DocumentVersionModel = require('../models/document_version')
+const mammoth = require('mammoth')
+const s3 = require('../util/s3')
+const { getDeltaFromHtml, getHtmlFromDelta } = require('../middlewares/quillConversion')
+const HTMLtoDOCX = require('html-docx-js')
+const OnlineDocument = require('../util/onlineDocument')
+const onlineDoc = new OnlineDocument()
 
 class Document {
   static limit = 30
@@ -17,6 +23,108 @@ class Document {
    * Return a list of all documents that only includes state:
    * Waiting, In-progress (editing mode)
    */
+
+  static async uploadVersion (req, res, next) {
+    try {
+      console.log("Here")
+      const { draftId } = req.params;
+      const draftDocument = await DocumentDraftModel.findById(draftId, 'filename etag lastModified body content html documentId path')
+
+      const docxFile = HTMLtoDOCX.asBlob(draftDocument.html)
+      const data = await s3
+          .putObject({
+            Bucket: process.env.S3_BUCKET,
+            Key: draftDocument.path,
+            Body: docxFile
+          })
+          .promise()
+
+      // If data do not have a location prop return an error
+      if (data === null || !Object.keys(data).length) {
+        throw new Error('No data version')
+      }
+      const etag = data.ETag.substring(1, data.ETag.length - 1)
+
+      const newDocumentVersion = new DocumentVersionModel({
+        etag: etag,
+        lastModified: new Date(),
+        content: draftDocument.content,
+        body: draftDocument.body,
+        html: draftDocument.html,
+        documentId: draftDocument.documentId,
+        versionId: data.VersionId,
+        isLatest: true,
+      })
+
+      await newDocumentVersion.save()
+
+      await DocumentModel.findByIdAndUpdate(draftDocument.documentId, {
+        $set: {
+          content: docxFile,
+          html: draftDocument.html
+        }
+      })
+
+      onlineDoc.updateDoc(newDocumentVersion)
+
+      return res.status(201).send({ status: 'success' })
+    } catch (err) {
+      console.log(err)
+      return res.status(500).send({ status: 'failed', error: err })
+    }
+  }
+
+  static async generateTransformedEditorContent (req, res, next) {
+    try {
+      const { documentId } = req.params;
+      console.log(documentId)
+      const document = await DocumentModel.findById(documentId, 'filename bucket path etag extension');
+
+      console.log("*********");
+      console.log(document);
+
+      const path = document.path;
+      const data = await s3.getObject({ Bucket: document.bucket, Key: document.path }).promise()
+
+
+      // Convert to HTML the DOCX file buffer
+      const html = await mammoth.convertToHtml({ buffer: data.Body })
+
+      // Convert to Quill Delta object from the HTML data
+      const delta = await getDeltaFromHtml(html.value)
+      const waitingStateId = await StateModel.findByState(['Waiting'])
+
+      await DocumentModel.updateOne({ _id: documentId }, { 
+        content: data.Body,
+        body: delta,
+        html: html.value,
+        lastModified: data.LastModified,
+        contentLength: data.ContentLength
+      });
+      
+      const newDocumentDraft = new DocumentDraftModel({
+        bucket: document.bucket,
+        filename: document.filename,
+        content: data.Body,
+        path: document.path,
+        extension: document.extension,
+        body: delta,
+        html: html.value,
+        etag: document.etag,
+        stateId: waitingStateId,
+        users: [],
+        documentId: document._id
+      })
+  
+      await newDocumentDraft.save()
+
+      return res.status(201).send({ status: 'success' })
+    } catch (err) {
+      console.log(err)
+      return res.status(500).send({ status: 'failed', error: err })
+    }
+  }
+
   static async getDocumentsByState (req, res, next) {
     try {
       // Get state ids
@@ -26,7 +134,6 @@ class Document {
       const data = await DocumentDraftModel
         .find({ stateId: { $in: stateIds } }, 'bucket filename path userConfirmations stateId users createdAt updatedAt')
         .populate('stateId')
-        .populate('users')
       // console.log(data);
 
       // In case data has length 0
@@ -154,13 +261,21 @@ class Document {
   static async getSidebarVersionHistory(req, res, next) {
     const {documentId} = req.params
     try {
-      const versions = await DocumentVersionModel.findRecentVersions(documentId, Document.historyLimit)
-      console.log(versions);
-      if (!versions.length) return next(handleError(404, 'Documents were not found!'))
+      var versions = await DocumentVersionModel.findRecentVersions(documentId, Document.historyLimit)
+      const versionObjs = await Promise.all(
+        versions.map(async (version) => {
+          var versionObj = version.toObject();
+          const user = await version.populateUser();
+          versionObj.user = user[0];
+          return versionObj;
+        })
+      )
+
+      if (!versionObjs.length) return next(handleError(404, 'Documents were not found!'))
 
       return res.status(200).send({
-        totalCount: versions.length,
-        versions: versions
+        totalCount: versionObjs.length,
+        versions: versionObjs
       })
     } catch (error) {
       // Destructure error object
@@ -190,9 +305,11 @@ class Document {
 
     try {
       const version = await DocumentVersionModel.findById(versionId, '-content -isLatest -etag')
-      .populate('userId')
+      var versionObj = version.toObject();
+      const user = await version.populateUser();
+      versionObj.user = user[0];
 
-      return res.status(200).send(version)
+      return res.status(200).send(versionObj)
 
     } catch (error) {
       // Destructure error object
@@ -201,27 +318,6 @@ class Document {
       return next(handleError(statusCode, `An error occurred retrieving the version: ${versionId}`, message, name))
     }
   }
-
-  
-
-  // static async createDraftDocument (req, res, next) {
-  //   const newData = req.body
-
-  //   try {
-  //     const newDraft = new DocumentDraftModel(newData)
-  //     await newDraft.save()
-  //   } catch (error) {
-  //     // Destructure error object
-  //     const { statusCode, message, name } = error
-  //     // Return an error
-  //     return next({
-  //       status: statusCode,
-  //       apiMessage: message,
-  //       friendlyMessage: 'An error occurred getting the editing documents',
-  //       errorName: name
-  //     })
-  //   }
-  // }
 }
 
 module.exports = Document

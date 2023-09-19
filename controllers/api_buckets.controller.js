@@ -1,13 +1,12 @@
 'use strict'
 const Wlogger = require('../config/winston')
 const s3 = require('../util/s3')
-const filePath = require('path')
 const mime = require('mime-types')
 const getVersionsByObject = require('../middlewares/getVersionsByObject')
 const fs = require('fs')
 const FileType = require('file-type')
 const handleError = require('../middlewares/handleError')
-const { convertToHtml, uploadToS3 } = require('../middlewares/documents/convertToDeltaFormat')
+const { convertToHtml, uploadToS3, bufferToDelta } = require('../middlewares/documents/convertToDeltaFormat')
 const fsPromises = require('fs/promises')
 
 class S3Bucket {
@@ -177,9 +176,10 @@ class S3Bucket {
    * @param versionId: A specific object version id
    */
   static async oneObject (req, res, next) {
+    console.log('entre aqui')
     // Get required query params to get one object
-    const { bucket, key, versionId } = req.query
-    // const versionId = req.params.versionId
+    const { key, versionId } = req.query
+    const bucket = process.env.S3_BUCKET
 
     try {
       // Call s3 function to get one specific object
@@ -198,8 +198,12 @@ class S3Bucket {
         })
       }
 
-      // // Return data
-      return res.status(200).send(data)
+      res.set({
+        'Content-Type': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        'Content-Disposition': `attachment; filename="${key}"`
+      })
+
+      res.send(data.Body)
     } catch (error) {
       const { statusCode, message, name } = error
       // Return an error
@@ -223,7 +227,7 @@ class S3Bucket {
     const { bucketName } = req.body
 
     const fileType = await FileType.fromFile(filePath)
-    const newFilename = originalname.split('.').slice(0, -1).join('.') + '.' + fileType.ext;
+    const newFilename = originalname.split('.').slice(0, -1).join('.') + '.' + fileType.ext
 
     try {
       // Validate if the uploaded filename exist in bucket
@@ -371,6 +375,49 @@ class S3Bucket {
         friendlyMessage: `An error occured restoring the document: ${key} with versionId: ${versionId}`,
         errorName: name
       })
+    }
+  }
+
+  static async checkFile (bucketName, originalname) {
+    try {
+      return await s3.headObject({ Bucket: bucketName, Key: originalname }).promise()
+    } catch (err) {
+      return false
+    }
+  }
+
+  /**
+   * Upload file in S3
+   */
+  static async upFile (req, res, next) {
+    const { originalname, path } = req.file
+    const { bucketName } = req.body
+
+    try {
+      const exists = await S3Bucket.checkFile(bucketName, originalname)
+
+      if (exists) {
+        fs.unlinkSync(path)
+
+        return next(handleError(400, `A file with name: ${originalname} already exists!`))
+      }
+
+      const s3Object = await s3.upload({
+        Bucket: bucketName,
+        Key: originalname,
+        Body: fs.createReadStream(path)
+      }).promise()
+
+      const fileType = await FileType.fromFile(path)
+      const buffer = fs.readFileSync(path)
+
+      await bufferToDelta(originalname, fileType.ext, buffer, s3Object)
+
+      fs.unlinkSync(path)
+
+      return res.status(201).send({ message: 'File uploaded' })
+    } catch (err) {
+      return next(handleError(err.statusCode || 500, err.message || 'Error uploading file'))
     }
   }
 }
