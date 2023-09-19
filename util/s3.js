@@ -6,6 +6,6 @@ const s3 = new AWS.S3({
   secretAccessKey
 })
 
-s3.config.update({ region: 'us-east-1' })
+s3.config.update({ region: process.env.S3_REGION })
 
 module.exports = s3
