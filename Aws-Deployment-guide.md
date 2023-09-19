@@ -19,7 +19,6 @@
 EC2 user data (add cli key/secret):
 
 	#!/bin/bash
-
 	#Install Ruby
 	echo "Installing Ruby..."
 	sudo yum -y update
@@ -63,7 +62,6 @@ EC2 user data (add cli key/secret):
 	echo "Installing AWS CLI..."
 	sudo pip3 install awscli
 	echo "AWS CLI installed successfully."
-
 	#Configure AWS CLI with access keys
 	echo "Configuring AWS CLI..."
 	aws configure set aws_access_key_id YOUR_ACCESS_KEY
