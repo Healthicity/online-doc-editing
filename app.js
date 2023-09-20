@@ -6,13 +6,8 @@ const logger = require('morgan')
 const cors = require('cors')
 const Wlogger = require('./config/winston')
 require('dotenv').config()
-const swaggerUI = require('swagger-ui-express')
-const swaggerJsDoc = require('swagger-jsdoc')
-const swaggerOptions = require('./swagger') // Swagger Api docs config options
 // const path = require('path')
 
-// Initialize Swagger Docs
-const swaggerSpecs = swaggerJsDoc(swaggerOptions)
 
 // Initialize middlewares
 app.use(cors())
@@ -42,9 +37,6 @@ const apiDocumentsRoutes = require('./routes/api_documents.route')
 // app.get('/client', (req, res) => res.sendFile(path.join(__dirname, '/public/index.html')))
 // Test API
 app.get('/health', (req, res) => res.sendStatus(200))
-
-// Swagger Documentation
-app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerSpecs, { explorer: true }))
 
 // API routes -------------------------
 app.use('/api_buckets', apiBucketsRoutes)
