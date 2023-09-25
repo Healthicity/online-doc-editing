@@ -80,24 +80,30 @@ class Document {
       console.log(documentId)
       const document = await DocumentModel.findById(documentId, 'filename bucket path etag extension');
 
-      console.log("*********");
-      console.log(document);
-
       const path = document.path;
       const data = await s3.getObject({ Bucket: document.bucket, Key: document.path }).promise()
 
+      let html;
+      let delta;
+      let htmlValue;
 
-      // Convert to HTML the DOCX file buffer
-      const html = await mammoth.convertToHtml({ buffer: data.Body })
-
-      // Convert to Quill Delta object from the HTML data
-      const delta = await getDeltaFromHtml(html.value)
-      const waitingStateId = await StateModel.findByState(['Waiting'])
+      try {
+        // Convert to HTML the DOCX file buffer
+        html = await mammoth.convertToHtml({ buffer: data.Body });
+        // Convert to Quill Delta object from the HTML data
+        delta = await getDeltaFromHtml(html.value);
+        htmlValue = html.value;
+      } catch (err) {
+        html = document.html;
+        // Convert to Quill Delta object from the HTML data
+        delta = await getDeltaFromHtml(html);
+        htmlValue = html;
+      }
 
       await DocumentModel.updateOne({ _id: documentId }, { 
         content: data.Body,
         body: delta,
-        html: html.value,
+        html: htmlValue,
         lastModified: data.LastModified,
         contentLength: data.ContentLength
       });
@@ -109,7 +115,7 @@ class Document {
         path: document.path,
         extension: document.extension,
         body: delta,
-        html: html.value,
+        html: htmlValue,
         etag: document.etag,
         stateId: waitingStateId,
         users: [],
