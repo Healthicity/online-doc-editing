@@ -82,6 +82,7 @@ class Document {
 
       const path = document.path;
       const data = await s3.getObject({ Bucket: document.bucket, Key: document.path }).promise()
+      const waitingStateId = await StateModel.findByState(['Waiting'])
 
       let html;
       let delta;
