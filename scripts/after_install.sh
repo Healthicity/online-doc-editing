@@ -23,6 +23,8 @@ params=(
 )
 
 # Loop through the parameters and fetch and set each one
+touch .env
+
 for param in "${params[@]}"; do
     value=$(aws ssm get-parameter --name "/Doc-Project-API/$param" --query 'Parameter.Value' --output text)
     if [ -n "$value" ]; then
