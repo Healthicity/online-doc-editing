@@ -1,6 +1,6 @@
 #!/bin/bash
 
-LOGS_DIR="/home/centos/Doc-Project-API/logs"
+LOGS_DIR="/home/centos/Doc-Project-API/"
 
 # Check if the logs directory exists
 if [ -d "$LOGS_DIR" ]; then
