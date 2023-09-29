@@ -2,6 +2,8 @@
 
 cd /home/centos
 
+rm -rf node_modules
+
 # Update the system
 sudo yum update -y
 
