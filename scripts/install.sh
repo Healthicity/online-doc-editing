@@ -4,6 +4,9 @@ cd /home/centos
 
 rm -rf node_modules
 
+# Set the AWS CLI region explicitly (replace 'us-west-2' with your desired region)
+aws configure set region us-west-2
+
 # Update the system
 sudo yum update -y
 
