@@ -2,6 +2,7 @@
 
 # Set the AWS CLI region explicitly
 aws configure set region us-west-2
+export AWS_DEFAULT_REGION=us-west-2
 
 # Define an array of parameter names without the prefix
 PARAMETER_NAMES=(
