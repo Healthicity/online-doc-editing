@@ -27,8 +27,31 @@ PARAMETER_NAMES=(
   "PLATFORM_PASSWORD"
 )
 
-# Create or truncate the .env file
-> .env
+# Define the directory where .env should be created
+ENV_DIRECTORY="/home/centos/Doc-Project-API"
+
+# Create the directory if it doesn't exist
+mkdir -p "$ENV_DIRECTORY"
+
+# Define the log file
+LOG_FILE="$ENV_DIRECTORY/deployment.log"
+
+# Initialize the log file
+> "$LOG_FILE"
+
+# Function to log errors
+log_error() {
+  local timestamp
+  timestamp=$(date +"%Y-%m-%d %T")
+  echo "[$timestamp] ERROR: $1" >> "$LOG_FILE"
+}
+
+# Function to log messages
+log_message() {
+  local timestamp
+  timestamp=$(date +"%Y-%m-%d %T")
+  echo "[$timestamp] INFO: $1" >> "$LOG_FILE"
+}
 
 # Retrieve and set the environment variables from AWS SSM
 for PARAMETER_NAME in "${PARAMETER_NAMES[@]}"; do
@@ -36,11 +59,15 @@ for PARAMETER_NAME in "${PARAMETER_NAMES[@]}"; do
   PARAMETER_VALUE=$(aws ssm get-parameter --name "$FULL_PARAMETER_NAME" --query "Parameter.Value" --output text 2>/dev/null)
   
   if [ -n "$PARAMETER_VALUE" ]; then
-    echo "$PARAMETER_NAME=$PARAMETER_VALUE" >> .env
-    echo "Retrieved $FULL_PARAMETER_NAME"
+    echo "$PARAMETER_NAME=$PARAMETER_VALUE" >> "$ENV_DIRECTORY/.env"
+    log_message "Retrieved $FULL_PARAMETER_NAME"
   else
-    echo "Warning: $FULL_PARAMETER_NAME not found or empty."
+    log_error "$FULL_PARAMETER_NAME not found or empty."
   fi
 done
 
-echo ".env file created successfully."
+if [ -s "$LOG_FILE" ]; then
+  echo "Error occurred. Check $LOG_FILE for details."
+else
+  echo ".env file created successfully in $ENV_DIRECTORY."
+fi
