@@ -2,6 +2,7 @@
 
 # Set the AWS CLI region explicitly
 aws configure set region us-west-2
+export AWS_DEFAULT_REGION=us-east-1
 
 # Retrieve the environment variables from AWS SSM
 echo "Retrieving environment variables from AWS SSM..."
