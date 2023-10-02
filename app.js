@@ -10,15 +10,25 @@ require('dotenv').config()
 
 
 // Initialize middlewares
-app.use(cors())
+app.use(cors({
+  origin: [
+    'https://localhost:3000',
+    'http://localhost:3000',
+    'http://localhost:3800',
+    'https://localhost:3800',
+    'https://inappdoc.qa.healthicity.com',
+    'http://inappdoc.qa.healthicity.com',
+  ]
+}))
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 app.use(logger('dev'))
 // app.use(express.static(path.join(__dirname, '/public')))
 
-// app.use((req, res, next) => {
-//   res.setHeader('Access-Control-Allow-Origin', '*');
-// });
+app.use((req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  return next();
+});
 
 // Check if app is running in 'development' or 'local' environment
 // if (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'local') {
@@ -36,6 +46,7 @@ const apiDocumentsRoutes = require('./routes/api_documents.route')
 // Set prefix api endpoints for all routes
 // app.get('/client', (req, res) => res.sendFile(path.join(__dirname, '/public/index.html')))
 // Test API
+
 app.get('/health', (req, res) => res.sendStatus(200))
 
 // API routes -------------------------
