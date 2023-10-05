@@ -8,6 +8,7 @@ const config = {
   host: process.env.PLATFORM_DB_HOST,
   dialect: process.env.PLATFORM_DB_DIALECT,
 }
+ console.log(config);
 
 const sequelize = new Sequelize(config.database, config.username, config.password, config);
 
