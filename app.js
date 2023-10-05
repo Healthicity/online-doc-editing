@@ -16,8 +16,8 @@ app.use(cors({
     'http://localhost:3000',
     'http://localhost:3800',
     'https://localhost:3800',
-    'https://inappdoc.qa.healthicity.com',
-    'http://inappdoc.qa.healthicity.com',
+    'https://inappdoc.uat.healthicity.com',
+    'http://inappdoc.uat.healthicity.com',
   ]
 }))
 app.use(express.json())
