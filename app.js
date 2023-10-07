@@ -8,29 +8,16 @@ const Wlogger = require('./config/winston')
 require('dotenv').config()
 // const path = require('path')
 
-
 // Initialize middlewares
 app.use(cors())
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 app.use(logger('dev'))
-// app.use(express.static(path.join(__dirname, '/public')))
-
-// app.use((req, res, next) => {
-//   res.setHeader('Access-Control-Allow-Origin', '*');
-// });
-
-// Check if app is running in 'development' or 'local' environment
-// if (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'local') {
-//   app.use(cors());
-// }
-
 // Init console log environment
 const environment = process.env.NODE_ENV
 Wlogger.info('IO API initiated; starting ' + environment + ' environment...')
 
 // Import all schema routes
-const apiBucketsRoutes = require('./routes/api_buckets.route')
 const apiDocumentsRoutes = require('./routes/api_documents.route')
 
 // Set prefix api endpoints for all routes
@@ -39,7 +26,6 @@ const apiDocumentsRoutes = require('./routes/api_documents.route')
 app.get('/health', (req, res) => res.sendStatus(200))
 
 // API routes -------------------------
-app.use('/api_buckets', apiBucketsRoutes)
 app.use('/api_documents', apiDocumentsRoutes)
 
 // API ERROR HANDLERS --------------------

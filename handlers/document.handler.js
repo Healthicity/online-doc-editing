@@ -4,8 +4,6 @@ const HTMLtoDOCX = require('html-to-docx')
 const DraftDocumentModel = require('../models/document_draft')
 const DocumentVersionModel = require('../models/document_version')
 
-const { getHtmlFromDelta, getDeltaFromHtml } = require('../middlewares/quillConversion')
-
 const OnlineUsers = require('../util/onlineUsers')
 const onlineUsers = new OnlineUsers()
 const OnlineDocument = require('../util/onlineDocument')
@@ -21,7 +19,6 @@ module.exports = (io, socket) => {
     try {
       // Get draft document by id from database
       const draftDocument = await DraftDocumentModel.findById(draftId)
-        .populate('stateId')
 
       if (!draftDocument) {
         throw new Error(`No draft document with id: ${draftId}`)
@@ -34,8 +31,8 @@ module.exports = (io, socket) => {
       onlineUsers.addUser(socket.id, draftId, draftDocument.filename)
       findOrCreateVersion(draftDocument.documentId.toString(), draftDocument, draftId)
 
-      var draftDocumentStringified = draftDocument.toObject();
-      draftDocumentStringified.users = await draftDocument.populateUsers();
+      const draftDocumentStringified = draftDocument.toObject()
+      draftDocumentStringified.users = await draftDocument.populateUsers()
 
       socket.emit('documents:getDraftDocument', draftDocumentStringified)
 
@@ -43,17 +40,13 @@ module.exports = (io, socket) => {
       io.to(draftId).emit('documents:getOnlineUsers', onlineUsers.getUserList(draftId))
 
       // Send updated changes
-      socket.on('documents:sendDraftChanges', async (delta, html) => {
-        // onlineDoc.updateDoc(oldDelta, data)
-        delta = delta || await getDeltaFromHtml(html)
-        html = html || await getHtmlFromDelta(delta)
-
+      socket.on('documents:sendDraftChanges', async (html) => {
         // Sets a modifier for a subsequent event emission that the
         // event data will only be broadcast to every sockets that
         // join the 'tag' room but the sender.
-        socket.broadcast.to(draftId).emit('documents:receiveDraftChanges', delta, html)
+        socket.broadcast.to(draftId).emit('documents:receiveDraftChanges', html)
         // io.to(draftId).emit('documents:receiveSavedDocument', socket.id, 'Saved changes!')
-        saveDocumentContent(draftId, delta, html)
+        saveDocumentContent(draftId, html)
       })
 
       socket.on('documents:cursorChange', (id, range) => {
@@ -76,7 +69,7 @@ module.exports = (io, socket) => {
   const findOrCreateVersion = async (documentId, draftDocument, draftId) => {
     if (documentId === null) return
 
-    const [latestVersion] = await DocumentVersionModel.find({ documentId: documentId }, 'etag versionId body createdAt updatedAt').sort({ createdAt: -1 }).limit(1)
+    const [latestVersion] = await DocumentVersionModel.find({ documentId }, 'etag versionId body createdAt updatedAt').sort({ createdAt: -1 }).limit(1)
     if (!latestVersion) {
       // Call s3 function to get one specific object
       const data = await s3
@@ -90,12 +83,10 @@ module.exports = (io, socket) => {
       const etag = data.ETag.substring(1, data.ETag.length - 1)
 
       const newDocumentVersion = new DocumentVersionModel({
-        etag: etag,
+        etag,
         lastModified: data.LastModified,
-        content: data.Body,
-        body: draftDocument.body,
         html: draftDocument.html,
-        documentId: documentId,
+        documentId,
         versionId: data.VersionId,
         userId: socket.data.user_id
       })
@@ -107,12 +98,10 @@ module.exports = (io, socket) => {
     }
   }
 
-  const saveDocumentContent = async (draftId, delta, html) => {
-    if (!delta || !html) return
+  const saveDocumentContent = async (draftId, html) => {
+    if (!html) return
 
-    const data = html || await getHtmlFromDelta(delta)
-
-    const buffer = await HTMLtoDOCX(data, null, {
+    const buffer = await HTMLtoDOCX(html, null, {
       table: { row: { cantSplit: true } },
       font: 'Helvetica',
       fontSize: 28
@@ -121,14 +110,13 @@ module.exports = (io, socket) => {
     try {
       console.log('saving document...')
       const draftDocument = await DraftDocumentModel.findById(draftId)
-      var userIds = draftDocument.userIds
+      let userIds = draftDocument.userIds
       userIds.push(socket.data.user_id)
       userIds = [...new Set(userIds)]
       await draftDocument.update({
-        body: delta,
         content: buffer,
-        userIds: userIds,
-        html,
+        userIds,
+        html
 
       })
       const currentUser = onlineUsers.getUser(socket.id)
@@ -179,15 +167,13 @@ module.exports = (io, socket) => {
     }
   }
 
-
-
   // DOCUMENT LISTENERS ---------------------------------
   socket.on('documents:getDraftDocumentById', getDraftDocumentById) // Get draft document by id
 
   // When a user disconnects
   socket.on('disconnect', (reason) => {
-    console.log(socket.id, 'disconnected');
-    console.log(`A user has disconnected: ${reason}`);
+    console.log(socket.id, 'disconnected')
+    console.log(`A user has disconnected: ${reason}`)
 
     const removedUser = onlineUsers.removeUser(socket.id)
     if (!removedUser) return

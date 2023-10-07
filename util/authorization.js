@@ -1,8 +1,8 @@
-var jwt = require('jsonwebtoken');
+const jwt = require('jsonwebtoken')
 
-function decryptAccessToken(socket) {
-  const access_token = socket.handshake.headers.authorization.split(' ')[1];
-  return jwt.verify(access_token, process.env.JWT_SECRET);
+function decryptAccessToken (socket) {
+  const accessToken = socket.handshake.headers.authorization.split(' ')[1]
+  return jwt.verify(accessToken, process.env.JWT_SECRET)
 }
 
 module.exports = {

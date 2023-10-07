@@ -1,5 +1,4 @@
 'use strict'
-// const registerS3DocumentHandlers = require('./s3_document.handler')
 // const registerDocumentHandlers = require('./document.handler')
 // const OnlineUsers = require('../util/onlineUsers')
 // const onlineUsers = new OnlineUsers()
