@@ -6,8 +6,8 @@ const Document = new Schema({
   bucket: String,
   uploaded_document_id: Number,
   filename: String,
+  content_type: String,
   path: { type: String },
-  html: String
 }, { timestamps: true })
 
 Document.index({

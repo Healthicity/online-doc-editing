@@ -8,6 +8,7 @@ const DocumentDraft = new Schema({
   _id: { type: Types.ObjectId, auto: true },
   bucket: String,
   filename: String,
+  content_type: String,
   path: { type: String },
   uploaded_document_revision_id: Number,
   html: String,

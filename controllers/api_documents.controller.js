@@ -20,14 +20,15 @@ class Document {
     try {
       const { draftId } = req.params
       const { userId } = req.query
-      const draftDocument = await DocumentDraftModel.findById(draftId, 'filename etag lastModified body content html documentId path')
+      const draftDocument = await DocumentDraftModel.findById(draftId, 'content_type html documentId path uploaded_document_revision_id')
 
       const docxFile = await HTMLtoDOCX(draftDocument.html)
       const data = await s3
         .putObject({
           Bucket: process.env.S3_BUCKET,
           Key: draftDocument.path,
-          Body: docxFile
+          Body: docxFile,
+          ContentType: draftDocument.content_type
         })
         .promise()
 
@@ -63,7 +64,7 @@ class Document {
       const { documentId } = req.params
       const { uploadedDocumentRevisionId } = req.query
       console.log(req.query)
-      const document = await DocumentModel.findById(documentId, 'bucket path filename')
+      const document = await DocumentModel.findById(documentId, 'bucket path filename content_type')
 
       const data = await s3.getObject({ Bucket: document.bucket, Key: document.path }).promise()
 
@@ -74,6 +75,7 @@ class Document {
         bucket: document.bucket,
         filename: document.filename,
         path: document.path,
+        content_type: document.content_type,
         html: html.value,
         users: [],
         documentId: document._id,
