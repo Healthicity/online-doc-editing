@@ -1,6 +1,6 @@
-'use strict';
-const { Model, DataTypes } = require('sequelize');
-const sequelize = require('../config/db-connection');
+'use strict'
+const { Model, DataTypes } = require('sequelize')
+const sequelize = require('../config/db-connection')
 
 class User extends Model {
 }
@@ -11,13 +11,13 @@ User.init(
       type: DataTypes.INTEGER,
       allowNull: false,
       primaryKey: true,
-      autoIncrement: true,
+      autoIncrement: true
     },
     first_name: {
-      type: DataTypes.STRING,
+      type: DataTypes.STRING
     },
     last_name: {
-      type: DataTypes.STRING,
+      type: DataTypes.STRING
     }
   },
   {
@@ -25,6 +25,6 @@ User.init(
     modelName: 'users',
     timestamps: false
   }
-);
+)
 
-module.exports = User;
+module.exports = User
