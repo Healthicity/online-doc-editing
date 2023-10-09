@@ -6,24 +6,15 @@ const { Op } = require('sequelize')
 
 const DocumentVersion = new Schema({
   _id: { type: Types.ObjectId, auto: true },
-  etag: String,
-  isLatest: { type: Boolean, default: false },
   lastModified: Date,
-  versionId: { type: String },
-  body: Object,
-  content: Buffer,
   html: String,
-  versionName: { type: String, default: '' },
   userId: Number,
+  uploaded_document_revision_id: Number,
   documentId: { type: Types.ObjectId, ref: DocumentSchema }
 }, { timestamps: true })
 
-DocumentVersion.statics.findByDocId = async function (docId, versionLimit) {
-  return await this.find({ documentId: docId, isLatest: false }, '-body -content -html').sort({ lastModified: 'desc' }).limit(versionLimit)
-}
-
 DocumentVersion.statics.findRecentVersions = async function (docId, versionLimit = 200) {
-  return await this.find({ documentId: docId }, 'html lastModified versionId versionName userId etag')
+  return await this.find({ documentId: docId }, 'html lastModified _id userId')
     .sort({ lastModified: 'desc' })
     .limit(versionLimit)
 }

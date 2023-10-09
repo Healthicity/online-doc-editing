@@ -10,12 +10,7 @@ const DocumentDraft = new Schema({
   filename: String,
   path: { type: String },
   uploaded_document_revision_id: Number,
-  content: Buffer,
   html: String,
-  extension: String,
-  lastModified: Date,
-  contentLength: Number,
-  etag: String,
   documentId: { type: Types.ObjectId, ref: DocumentSchema },
   userConfirmations: { type: Number, default: 0 },
   userIds: [Number]

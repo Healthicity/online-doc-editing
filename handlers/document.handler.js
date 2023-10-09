@@ -1,6 +1,5 @@
 'use strict'
 
-const HTMLtoDOCX = require('html-to-docx')
 const DraftDocumentModel = require('../models/document_draft')
 const DocumentVersionModel = require('../models/document_version')
 
@@ -8,9 +7,6 @@ const OnlineUsers = require('../util/onlineUsers')
 const onlineUsers = new OnlineUsers()
 const OnlineDocument = require('../util/onlineDocument')
 const onlineDoc = new OnlineDocument()
-
-const s3 = require('../util/s3')
-const util = require('util')
 
 module.exports = (io, socket) => {
   const getDraftDocumentById = async (draftId) => {
@@ -45,20 +41,8 @@ module.exports = (io, socket) => {
         // event data will only be broadcast to every sockets that
         // join the 'tag' room but the sender.
         socket.broadcast.to(draftId).emit('documents:receiveDraftChanges', html)
-        // io.to(draftId).emit('documents:receiveSavedDocument', socket.id, 'Saved changes!')
         saveDocumentContent(draftId, html)
       })
-
-      socket.on('documents:cursorChange', (id, range) => {
-        const userCursor = onlineUsers.getUser(id)
-        socket.to(draftId).emit('documents:receiveCursorChange', userCursor, range)
-      })
-
-      // socket.on('documents:saveNewVersion', (draftId, body) => {
-      //   saveNewDocumentVersion(draftId, body)
-      // })
-
-      socket.on('documents:saveNewVersion', saveNewDocumentVersion(draftId)) // Save document when editor text changed
     } catch (error) {
       console.error('An error occured in getDraftDocumentById method')
       console.error(error.message)
@@ -69,26 +53,16 @@ module.exports = (io, socket) => {
   const findOrCreateVersion = async (documentId, draftDocument, draftId) => {
     if (documentId === null) return
 
-    const [latestVersion] = await DocumentVersionModel.find({ documentId }, 'etag versionId body createdAt updatedAt').sort({ createdAt: -1 }).limit(1)
+    const [latestVersion] = await DocumentVersionModel.find({ documentId }, 'isLatest html').sort({ createdAt: -1 }).limit(1)
     if (!latestVersion) {
-      // Call s3 function to get one specific object
-      const data = await s3
-        .getObject({ Bucket: process.env.S3_BUCKET, Key: draftDocument.path })
-        .promise()
-
-      // If data do not have a location prop return an error
-      if (data === null || !Object.keys(data).length) {
-        throw new Error('No data version')
-      }
-      const etag = data.ETag.substring(1, data.ETag.length - 1)
-
+      console.log("Create initial version of document")
+      const draftDocument = await DraftDocumentModel.findById(draftId)
       const newDocumentVersion = new DocumentVersionModel({
-        etag,
-        lastModified: data.LastModified,
+        lastModified: new Date(),
         html: draftDocument.html,
         documentId,
-        versionId: data.VersionId,
-        userId: socket.data.user_id
+        userId: socket.data.user_id,
+        uploaded_document_revision_id: draftDocument.uploaded_document_revision_id
       })
 
       const versionSaved = await newDocumentVersion.save()
@@ -101,12 +75,6 @@ module.exports = (io, socket) => {
   const saveDocumentContent = async (draftId, html) => {
     if (!html) return
 
-    const buffer = await HTMLtoDOCX(html, null, {
-      table: { row: { cantSplit: true } },
-      font: 'Helvetica',
-      fontSize: 28
-    })
-
     try {
       console.log('saving document...')
       const draftDocument = await DraftDocumentModel.findById(draftId)
@@ -114,51 +82,50 @@ module.exports = (io, socket) => {
       userIds.push(socket.data.user_id)
       userIds = [...new Set(userIds)]
       await draftDocument.update({
-        content: buffer,
         userIds,
         html
 
       })
+      saveNewDocumentVersion(draftId, html)
       const currentUser = onlineUsers.getUser(socket.id)
       io.to(draftId).emit('documents:receiveSavedDocument', currentUser, 'Saved changes!')
 
-      // Save edition of user
-      // saveDocumentEdition(draftId, currentUser, edition)
-
-      // // Save a new version of the document draft
-      // saveNewDocumentVersion(draftId, body)
     } catch (error) {
       console.error('An error occured in saveDocumentContent method')
       console.error(error.message)
       return error
     }
   }
-  // TODO:
-  // Compare delta body to delta body from the latest version stored in database.
-  const saveNewDocumentVersion = (draftId) => async (delta, html) => {
+
+  const saveNewDocumentVersion = async (draftId, html) => {
     if (draftId === null) return
 
-    // console.log(onlineDoc.getDocument().latestVersion.body)
-    // console.log(currentDelta)
-    const isSameData = delta
-      ? util.isDeepStrictEqual(onlineDoc.getDocument().latestVersion.body, delta)
-      : util.isDeepStrictEqual(onlineDoc.getDocument().latestVersion.html, html)
-    // console.log(isSameDelta)
-
+    console.log(onlineDoc.getDocument().latestVersion.html)
+    console.log(html)
+    const isSameData = onlineDoc.getDocument().latestVersion.html === html
+    console.log(isSameData)
     if (!isSameData) {
       console.log('Body is different as the latest version')
       // SAVE NEW VERSION IN DATABASE
       try {
-      // Get draft document by id from database
-        const draftDocument = await DraftDocumentModel.findById(draftId, 'filename etag lastModified body content html documentId path')
-        const docxFile = HTMLtoDOCX(draftDocument.html)
-
         await DraftDocumentModel.findByIdAndUpdate(draftId, {
           $set: {
-            content: docxFile,
             html
           }
         })
+
+        const draftDocument = await DraftDocumentModel.findById(draftId)
+        const newDocumentVersion = new DocumentVersionModel({
+          lastModified: new Date(),
+          html,
+          userId: socket.data.user_id,
+          documentId: draftDocument.documentId,
+          uploaded_document_revision_id: draftDocument.uploaded_document_revision_id
+        })
+
+        await newDocumentVersion.save()
+
+        onlineDoc.updateDoc(newDocumentVersion)
       } catch (error) {
         console.error('An error occured in saveNewDocumentVersion method')
         console.error(error.message)

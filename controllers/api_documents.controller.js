@@ -35,23 +35,20 @@ class Document {
       if (data === null || !Object.keys(data).length) {
         throw new Error('No data version')
       }
-      const etag = data.ETag.substring(1, data.ETag.length - 1)
 
-      const newDocumentVersion = new DocumentVersionModel({
-        etag,
-        lastModified: new Date(),
-        content: draftDocument.content,
-        body: draftDocument.body,
-        html: draftDocument.html,
-        documentId: draftDocument.documentId,
-        versionId: data.VersionId,
-        userId,
-        isLatest: true,
-        uploaded_document_revision_id: draftDocument.uploaded_document_revision_id
-      })
-
-      await newDocumentVersion.save()
-
+      var [newDocumentVersion] = await DocumentVersionModel.findRecentVersions(draftDocument.documentId, 1)
+      const isSameData = newDocumentVersion.html === draftDocument.html
+      
+      if (!isSameData) {
+        newDocumentVersion = new DocumentVersionModel({
+          lastModified: new Date(),
+          html: draftDocument.html,
+          documentId: draftDocument.documentId,
+          userId,
+          uploaded_document_revision_id: draftDocument.uploaded_document_revision_id
+        })
+        await newDocumentVersion.save()
+      }
       onlineDoc.updateDoc(newDocumentVersion)
 
       return res.status(201).send({ status: 'success' })
@@ -76,10 +73,8 @@ class Document {
       const newDocumentDraft = new DocumentDraftModel({
         bucket: document.bucket,
         filename: document.filename,
-        content: data.Body,
         path: document.path,
         html: html.value,
-        etag: data.ETag,
         users: [],
         documentId: document._id,
         uploaded_document_revision_id: uploadedDocumentRevisionId
@@ -125,7 +120,7 @@ class Document {
     const { versionId } = req.params
 
     try {
-      const version = await DocumentVersionModel.findById(versionId, '-content -isLatest -etag')
+      const version = await DocumentVersionModel.findById(versionId, '-html')
       const versionObj = version.toObject()
       const user = await version.populateUser()
       versionObj.user = user[0]
