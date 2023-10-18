@@ -22,7 +22,10 @@ class Document {
       const { userId } = req.query
       const draftDocument = await DocumentDraftModel.findById(draftId, 'content_type html documentId path uploaded_document_revision_id')
 
-      const docxFile = await HTMLtoDOCX(draftDocument.html)
+      const docxFile = await HTMLtoDOCX(draftDocument.html , null, {
+        font: 'Helvetica',
+        fontSize: 28
+      })
       const data = await s3
         .putObject({
           Bucket: process.env.S3_BUCKET,
