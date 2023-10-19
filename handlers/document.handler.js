@@ -40,7 +40,8 @@ module.exports = (io, socket) => {
         // Sets a modifier for a subsequent event emission that the
         // event data will only be broadcast to every sockets that
         // join the 'tag' room but the sender.
-        socket.broadcast.to(draftId).emit('documents:receiveDraftChanges', html)
+        // socket.broadcast.to(draftId).emit('documents:receiveDraftChanges', html)
+        console.log('sending changes in backend...')
         saveDocumentContent(draftId, html)
       })
     } catch (error) {
@@ -88,7 +89,8 @@ module.exports = (io, socket) => {
       })
       saveNewDocumentVersion(draftId, html)
       const currentUser = onlineUsers.getUser(socket.id)
-      io.to(draftId).emit('documents:receiveSavedDocument', currentUser, 'Saved changes!')
+      socket.broadcast.to(draftId).emit('documents:receiveDraftChanges', html)
+      // io.to(draftId).emit('documents:receiveSavedDocument', currentUser, 'Saved changes!')
 
     } catch (error) {
       console.error('An error occured in saveDocumentContent method')
