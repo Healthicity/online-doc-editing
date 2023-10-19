@@ -1,6 +1,5 @@
 'use strict'
 const handleError = require('../middlewares/handleError')
-const DocumentModel = require('../models/document')
 const DocumentDraftModel = require('../models/document_draft')
 const DocumentVersionModel = require('../models/document_version')
 const mammoth = require('mammoth')
@@ -8,19 +7,18 @@ const s3 = require('../util/s3')
 const HTMLtoDOCX = require('html-to-docx')
 const OnlineDocument = require('../util/onlineDocument')
 const onlineDoc = new OnlineDocument()
+const { authorize } = require('../util/authorization')
 
 class Document {
-  static limit = 30
-  static versionLimit = 5
-  static editingStates = ['Waiting', 'In-progress']
-  static reviewStates = ['Review']
   static historyLimit = 200
 
   static async uploadVersion (req, res, next) {
     try {
       const { draftId } = req.params
       const { userId } = req.query
-      const draftDocument = await DocumentDraftModel.findById(draftId, 'content_type html documentId path uploaded_document_revision_id')
+      const draftDocument = await DocumentDraftModel.findById(draftId, 'content_type html documentId path')
+
+      authorize(req, draftDocument._id.toString())
 
       const docxFile = await HTMLtoDOCX(draftDocument.html , null, {
         font: 'Helvetica',
@@ -31,7 +29,7 @@ class Document {
           Bucket: process.env.S3_BUCKET,
           Key: draftDocument.path,
           Body: docxFile,
-          ContentType: draftDocument.content_type
+          ContentType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
         })
         .promise()
 
@@ -41,7 +39,8 @@ class Document {
       }
 
       var [newDocumentVersion] = await DocumentVersionModel.findRecentVersions(draftDocument.documentId, 1)
-      const isSameData = newDocumentVersion.html === draftDocument.html
+      // newDocumentVersion can be empty if CM user does not open the editor but still select "Edit document" option
+      const isSameData = newDocumentVersion?.html === draftDocument.html
       
       if (!isSameData) {
         newDocumentVersion = new DocumentVersionModel({
@@ -49,7 +48,7 @@ class Document {
           html: draftDocument.html,
           documentId: draftDocument.documentId,
           userId,
-          uploaded_document_revision_id: draftDocument.uploaded_document_revision_id
+          draftDocumentId: draftDocument._id
         })
         await newDocumentVersion.save()
       }
@@ -64,28 +63,19 @@ class Document {
 
   static async generateTransformedEditorContent (req, res, next) {
     try {
-      const { documentId } = req.params
-      const { uploadedDocumentRevisionId } = req.query
-      console.log(req.query)
-      const document = await DocumentModel.findById(documentId, 'bucket path filename content_type')
-
-      const data = await s3.getObject({ Bucket: document.bucket, Key: document.path }).promise()
+      const { draftId } = req.params
+      const draftDocument = await DocumentDraftModel.findById(draftId)
+      authorize(req, draftDocument._id.toString()) // Check if the user is authorized to access the document
+      const data = await s3.getObject({ Bucket: draftDocument.bucket, Key: draftDocument.path }).promise()
 
       // Convert to HTML the DOCX file buffer
       const html = await mammoth.convertToHtml({ buffer: data.Body })
 
-      const newDocumentDraft = new DocumentDraftModel({
-        bucket: document.bucket,
-        filename: document.filename,
-        path: document.path,
-        content_type: document.content_type,
-        html: html.value,
-        users: [],
-        documentId: document._id,
-        uploaded_document_revision_id: uploadedDocumentRevisionId
+      await DocumentDraftModel.findByIdAndUpdate(draftId, {
+        $set: {
+          html: html.value,
+        }
       })
-
-      await newDocumentDraft.save()
 
       return res.status(201).send({ status: 'success' })
     } catch (err) {

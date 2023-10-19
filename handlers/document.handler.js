@@ -62,7 +62,7 @@ module.exports = (io, socket) => {
         html: draftDocument.html,
         documentId,
         userId: socket.data.user_id,
-        uploaded_document_revision_id: draftDocument.uploaded_document_revision_id
+        draftDocumentId: draftDocument._id
       })
 
       const versionSaved = await newDocumentVersion.save()
@@ -120,7 +120,7 @@ module.exports = (io, socket) => {
           html,
           userId: socket.data.user_id,
           documentId: draftDocument.documentId,
-          uploaded_document_revision_id: draftDocument.uploaded_document_revision_id
+          draftDocumentId: draftDocument._id
         })
 
         await newDocumentVersion.save()

@@ -1,6 +1,7 @@
 'use strict'
 const { Schema, model, Types } = require('mongoose')
 const DocumentSchema = require('./document')
+const DocumentDraftSchema = require('./document_draft')
 const User = require('./user')
 const { Op } = require('sequelize')
 
@@ -9,7 +10,7 @@ const DocumentVersion = new Schema({
   lastModified: Date,
   html: String,
   userId: Number,
-  uploaded_document_revision_id: Number,
+  draftDocumentId: { type: Types.ObjectId, ref: DocumentDraftSchema },
   documentId: { type: Types.ObjectId, ref: DocumentSchema }
 }, { timestamps: true })
 

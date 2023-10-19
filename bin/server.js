@@ -19,10 +19,12 @@ const AuthenticationTokenModel = require('../models/authentication_token')
 
 io.use((socket, next) => {
   const authToken = socket.handshake.auth.token
+  // Here authToken does the socket authentication
+  // Authorization Header token is used only to get the current user id
   AuthenticationTokenModel.findOne({ token: authToken }).then((authenticationToken) => {
     if (authenticationToken?.token === authToken) {
       console.log('Authenticated')
-      const payload = decryptAccessToken(socket)
+      const payload = decryptAccessToken(socket.handshake.headers.authorization)
       socket.data.user_id = payload.platform_user_id
       next()
     } else {
