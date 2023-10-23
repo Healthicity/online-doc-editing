@@ -5,7 +5,7 @@ const documentsCtrl = require('../controllers/api_documents.controller')
 documentsRouter.get('/recent-versions/:documentId', documentsCtrl.getSidebarVersionHistory) // Get recent versions to sidebar history
 documentsRouter.get('/one-version/:versionId', documentsCtrl.getVersionById)
 
-documentsRouter.get('/generate-content/:documentId', documentsCtrl.generateTransformedEditorContent)
+documentsRouter.get('/generate-content/:draftId', documentsCtrl.generateTransformedEditorContent)
 documentsRouter.get('/upload-version/:draftId', documentsCtrl.uploadVersion)
 
 module.exports = documentsRouter

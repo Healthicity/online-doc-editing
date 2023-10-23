@@ -4,7 +4,7 @@ const { Schema, model, Types } = require('mongoose')
 const AccessToken = new Schema({
   _id: { type: Types.ObjectId, auto: true },
   user_id: Number,
-  document_id: Types.ObjectId,
+  document_draft_id: String,
   token: String
 })
 
