@@ -89,7 +89,7 @@ module.exports = (io, socket) => {
       })
       saveNewDocumentVersion(draftId, html)
       const currentUser = onlineUsers.getUser(socket.id)
-      socket.broadcast.to(draftId).emit('documents:receiveDraftChanges', html)
+      io.to(draftId).emit('documents:receiveDraftChanges', html)
       // io.to(draftId).emit('documents:receiveSavedDocument', currentUser, 'Saved changes!')
 
     } catch (error) {
