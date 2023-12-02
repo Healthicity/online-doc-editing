@@ -76,7 +76,7 @@ function clientErrorHandler (err, req, res, next) {
 // Server error handler
 function errorHandler (err, req, res, next) {
   err.status = err.status || 500
-  if (environment === 'development' || environment === 'local') {
+  if (environment === 'development') {
     return res
       .status(err.status)
       .send({

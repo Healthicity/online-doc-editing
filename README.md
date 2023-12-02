@@ -1,12 +1,23 @@
-# DocProject, please execute:
+# Document Editing in CM (Backend)
 
-# First
+## Setup instructions for Mac
 
-NPM INSTALL
+Prerequisite - Install [brew](https://brew.sh/)
 
-# Second
+Here `n` is used to install the node version. If you are using other version managers like `nvm` follow the instructions for that version manager to install required node version to avoid any conflicts.
 
-NG SERVE
+```
+brew install n
+sudo n 16.20
+brew tap mongodb/brew
+brew update
+brew install mongodb-community@7.0
+brew services start mongodb/brew/mongodb-community
+cp .env.development .env
+npm install
+NODE_ENV=development npm start
+```
+Follow the steps in this [link](https://github.com/Healthicity/compliance-manager/blob/master/docs/local_development_setup.md) to setup platform database
 
 # AWS Deployment Guide
 
