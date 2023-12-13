@@ -9,6 +9,8 @@ const DocumentVersion = new Schema({
   _id: { type: Types.ObjectId, auto: true },
   lastModified: Date,
   html: String,
+  header: String,
+  footer: String,
   userId: Number,
   draftDocumentId: { type: Types.ObjectId, ref: DocumentDraftSchema },
   documentId: { type: Types.ObjectId, ref: DocumentSchema }

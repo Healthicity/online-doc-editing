@@ -13,6 +13,8 @@ const DocumentDraft = new Schema({
   record_id: Number,
   record_type: String,
   html: String,
+  header: String,
+  footer: String,
   documentId: { type: Types.ObjectId, ref: DocumentSchema },
   userConfirmations: { type: Number, default: 0 },
   userIds: [Number]
