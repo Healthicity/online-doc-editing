@@ -36,12 +36,12 @@ module.exports = (io, socket) => {
       io.to(draftId).emit('documents:getOnlineUsers', onlineUsers.getUserList(draftId))
 
       // Send updated changes
-      socket.on('documents:sendDraftChanges', async (html) => {
+      socket.on('documents:sendDraftChanges', async (docDetails) => {
         // Sets a modifier for a subsequent event emission that the
         // event data will only be broadcast to every sockets that
         // join the 'tag' room but the sender.
-        socket.broadcast.to(draftId).emit('documents:receiveDraftChanges', html)
-        saveDocumentContent(draftId, html)
+        socket.broadcast.to(draftId).emit('documents:receiveDraftChanges', docDetails)
+        saveDocumentContent(draftId, docDetails)
       })
     } catch (error) {
       console.error('An error occured in getDraftDocumentById method')
@@ -53,13 +53,15 @@ module.exports = (io, socket) => {
   const findOrCreateVersion = async (documentId, draftDocument, draftId) => {
     if (documentId === null) return
 
-    const [latestVersion] = await DocumentVersionModel.find({ documentId }, 'isLatest html').sort({ createdAt: -1 }).limit(1)
+    const [latestVersion] = await DocumentVersionModel.find({ documentId }, 'isLatest html header footer').sort({ createdAt: -1 }).limit(1)
+  
     if (!latestVersion) {
-      console.log("Create initial version of document")
       const draftDocument = await DraftDocumentModel.findById(draftId)
       const newDocumentVersion = new DocumentVersionModel({
         lastModified: new Date(),
         html: draftDocument.html,
+        header: draftDocument.header,
+        footer: draftDocument.footer,
         documentId,
         userId: socket.data.user_id,
         draftDocumentId: draftDocument._id
@@ -72,8 +74,8 @@ module.exports = (io, socket) => {
     }
   }
 
-  const saveDocumentContent = async (draftId, html) => {
-    if (!html) return
+  const saveDocumentContent = async (draftId, docDetails) => {
+    if (!docDetails) return
 
     try {
       console.log('saving document...')
@@ -83,10 +85,11 @@ module.exports = (io, socket) => {
       userIds = [...new Set(userIds)]
       await draftDocument.update({
         userIds,
-        html
-
+        html: docDetails.content,
+        header: docDetails.header,
+        footer: docDetails.footer
       })
-      saveNewDocumentVersion(draftId, html)
+      saveNewDocumentVersion(draftId, docDetails)
       const currentUser = onlineUsers.getUser(socket.id)
       io.to(draftId).emit('documents:receiveSavedDocument', currentUser, 'Saved changes!')
 
@@ -97,27 +100,37 @@ module.exports = (io, socket) => {
     }
   }
 
-  const saveNewDocumentVersion = async (draftId, html) => {
+  const saveNewDocumentVersion = async (draftId, docDetails) => {
     if (draftId === null) return
 
     console.log(onlineDoc.getDocument().latestVersion.html)
-    console.log(html)
-    const isSameData = onlineDoc.getDocument().latestVersion.html === html
-    console.log(isSameData)
-    if (!isSameData) {
+    console.log("Save Version");
+    console.log(docDetails);
+
+    const isSameContentData = docDetails.content && onlineDoc.getDocument().latestVersion.html === docDetails.content;
+    const isSameHeaderData = docDetails.header && onlineDoc.getDocument().latestVersion.header === docDetails.header;
+    const isSameFooterData = docDetails.footer && onlineDoc.getDocument().latestVersion.footer === docDetails.footer;
+
+    if (!isSameContentData || !isSameHeaderData || !isSameFooterData) {
       console.log('Body is different as the latest version')
       // SAVE NEW VERSION IN DATABASE
       try {
         await DraftDocumentModel.findByIdAndUpdate(draftId, {
           $set: {
-            html
+            html: docDetails.content,
+            header: docDetails.header,
+            footer: docDetails.footer
           }
         })
 
         const draftDocument = await DraftDocumentModel.findById(draftId)
+
+        console.log("hello")
         const newDocumentVersion = new DocumentVersionModel({
           lastModified: new Date(),
-          html,
+          html: docDetails.content,
+          header: docDetails.header,
+          footer: docDetails.footer,
           userId: socket.data.user_id,
           documentId: draftDocument.documentId,
           draftDocumentId: draftDocument._id

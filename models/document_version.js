@@ -17,7 +17,7 @@ const DocumentVersion = new Schema({
 }, { timestamps: true })
 
 DocumentVersion.statics.findRecentVersions = async function (docId, versionLimit = 200) {
-  return await this.find({ documentId: docId }, 'html lastModified _id userId')
+  return await this.find({ documentId: docId }, 'html header footer lastModified _id userId')
     .sort({ lastModified: 'desc' })
     .limit(versionLimit)
 }
