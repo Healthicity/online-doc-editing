@@ -3,11 +3,11 @@ const handleError = require('../middlewares/handleError')
 const DocumentDraftModel = require('../models/document_draft')
 const DocumentVersionModel = require('../models/document_version')
 const mammoth = require('mammoth')
-const s3 = require('../util/s3')
+const { s3, readFile } = require('../util/s3')
 const HTMLtoDOCX = require('html-to-docx')
 const OnlineDocument = require('../util/onlineDocument')
 const onlineDoc = new OnlineDocument()
-const { authorize } = require('../util/authorization')
+const { authorize, ckeDocxToHtml } = require('../util/common')
 
 class Document {
   static historyLimit = 200
@@ -71,19 +71,22 @@ class Document {
     }
   }
 
+
   static async generateTransformedEditorContent (req, res, next) {
     try {
       const { draftId } = req.params
       const draftDocument = await DocumentDraftModel.findById(draftId)
       authorize(req, draftDocument._id.toString()) // Check if the user is authorized to access the document
-      const data = await s3.getObject({ Bucket: draftDocument.bucket, Key: draftDocument.path }).promise()
+
+      const data =  await readFile(draftDocument);
+      const htmlData = await ckeDocxToHtml(data);
 
       // Convert to HTML the DOCX file buffer
-      const html = await mammoth.convertToHtml({ buffer: data.Body })
+      // const html = await mammoth.convertToHtml({ buffer: data.Body })
 
       await DocumentDraftModel.findByIdAndUpdate(draftId, {
         $set: {
-          html: html.value,
+          html: htmlData,
         }
       })
 

@@ -8,4 +8,18 @@ const s3 = new AWS.S3({
 
 s3.config.update({ region: process.env.S3_REGION })
 
-module.exports = s3
+const readFile = (draftDocument) => {
+  return new Promise(function (resolve, reject) {
+      var params = { Bucket: draftDocument.bucket, Key: draftDocument.path };
+      s3.getObject(params, function (err, data) {
+        if (err) {
+            reject(err.message);
+        } else {
+            var data = Buffer.from(data.Body)
+            resolve(data);
+        }
+      });
+  });
+}
+
+module.exports = { s3, readFile }

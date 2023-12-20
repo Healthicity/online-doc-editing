@@ -104,15 +104,12 @@ module.exports = (io, socket) => {
     if (draftId === null) return
 
     console.log(onlineDoc.getDocument().latestVersion.html)
-    console.log("Save Version");
-    console.log(docDetails);
 
     const isSameContentData = docDetails.content && onlineDoc.getDocument().latestVersion.html === docDetails.content;
     const isSameHeaderData = docDetails.header && onlineDoc.getDocument().latestVersion.header === docDetails.header;
     const isSameFooterData = docDetails.footer && onlineDoc.getDocument().latestVersion.footer === docDetails.footer;
 
     if (!isSameContentData || !isSameHeaderData || !isSameFooterData) {
-      console.log('Body is different as the latest version')
       // SAVE NEW VERSION IN DATABASE
       try {
         await DraftDocumentModel.findByIdAndUpdate(draftId, {
@@ -125,7 +122,6 @@ module.exports = (io, socket) => {
 
         const draftDocument = await DraftDocumentModel.findById(draftId)
 
-        console.log("hello")
         const newDocumentVersion = new DocumentVersionModel({
           lastModified: new Date(),
           html: docDetails.content,

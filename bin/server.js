@@ -6,7 +6,7 @@ const { Server } = require('socket.io')
 const mongoConnection = require('../config/mongo-connection')
 const http = require('http')
 const sequelize = require('../config/db-connection')
-const { decryptAccessToken } = require('../util/authorization')
+const { decryptAccessToken } = require('../util/common')
 const server = http.createServer(app)
 const io = new Server(server, {
   pingTimeout: 60000,
