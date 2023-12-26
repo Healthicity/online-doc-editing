@@ -103,8 +103,6 @@ module.exports = (io, socket) => {
   const saveNewDocumentVersion = async (draftId, docDetails) => {
     if (draftId === null) return
 
-    console.log(onlineDoc.getDocument().latestVersion.html)
-
     const isSameContentData = docDetails.content && onlineDoc.getDocument().latestVersion.html === docDetails.content;
     const isSameHeaderData = docDetails.header && onlineDoc.getDocument().latestVersion.header === docDetails.header;
     const isSameFooterData = docDetails.footer && onlineDoc.getDocument().latestVersion.footer === docDetails.footer;

@@ -71,7 +71,6 @@ class Document {
     }
   }
 
-
   static async generateTransformedEditorContent (req, res, next) {
     try {
       const { draftId } = req.params
