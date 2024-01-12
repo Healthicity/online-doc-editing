@@ -15,31 +15,39 @@ function authorize(req, draftDocumentId) {
   }
 }
 
-function ckeConfig () {
-  const token = jwt.sign( { aud: process.env.CKE_ENVIRONMENT_ID }, process.env.CKE_ACCESS_KEY , { algorithm: 'HS256' } );
+function ckeConfig() {
+  const audience = process.env.CKE_ENVIRONMENT_ID;
+  const secretKey = process.env.CKE_ACCESS_KEY;
+
+  if (!audience || !secretKey) {
+    throw new Error('Missing environment variables for CKEditor Cloud Services.');
+  }
+
+  const token = jwt.sign({ aud: audience }, secretKey, { algorithm: 'HS256' });
   return { headers: { 'Authorization': token } };
 }
 
 const ckeDocxToHtml = (data) => {
+  const formData = new FormData();
+  formData.append('file', data, 'document_file.docx');
+  formData.append('config', JSON.stringify({default_styles: true}));
+
   return new Promise(function (resolve, reject) {
-    const formData = new FormData();
-    formData.append( 'file', data, 'document_file.docx' );
-    axios.post( 'https://docx-converter.cke-cs.com/v2/convert/docx-html', formData, ckeConfig )
-      .then( response => {
+    axios.post('https://docx-converter.cke-cs.com/v2/convert/docx-html', formData, ckeConfig())
+      .then(response => {
         const htmlData = response.data.html;
         resolve(htmlData);
-      } ).catch( error => {
-        console.log( 'Conversion error', error );
+      })
+      .catch(error => {
+        console.log('Conversion error', error);
         reject(error);
-      } 
-    );
+      });
   });
-}
+};
 
 
 module.exports = {
   decryptAccessToken,
   authorize,
-  ckeConfig,
   ckeDocxToHtml
 }
