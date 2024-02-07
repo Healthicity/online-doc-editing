@@ -33,7 +33,7 @@ const ckeDocxToHtml = (data) => {
   formData.append('config', JSON.stringify({default_styles: true}));
 
   return new Promise(function (resolve, reject) {
-    axios.post('https://docx-converter.cke-cs.com/v2/convert/docx-html', formData, ckeConfig())
+    axios.post('https://ckeditordocxconverter.uat.healthicity.com/v2/convert/docx-html', formData, ckeConfig())
       .then(response => {
         const htmlData = response.data.html;
         resolve(htmlData);
