@@ -2,12 +2,11 @@
 const handleError = require('../middlewares/handleError')
 const DocumentDraftModel = require('../models/document_draft')
 const DocumentVersionModel = require('../models/document_version')
-const mammoth = require('mammoth')
 const { s3, readFile } = require('../util/s3')
 const HTMLtoDOCX = require('html-to-docx')
 const OnlineDocument = require('../util/onlineDocument')
 const onlineDoc = new OnlineDocument()
-const { authorize, ckeDocxToHtml } = require('../util/common')
+const { authorize, ckeDocxToHtml, ckEditorTokenGenerator } = require('../util/common')
 
 class Document {
   static historyLimit = 200
@@ -65,6 +64,15 @@ class Document {
       onlineDoc.updateDoc(newDocumentVersion)
 
       return res.status(201).send({ status: 'success' })
+    } catch (err) {
+      console.log(err)
+      return res.status(500).send({ status: 'failed', error: err })
+    }
+  }
+
+  static async getCKEditorToken (req, res, next) {
+    try {
+      return res.status(200).send(ckEditorTokenGenerator())
     } catch (err) {
       console.log(err)
       return res.status(500).send({ status: 'failed', error: err })

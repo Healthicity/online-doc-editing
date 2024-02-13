@@ -15,16 +15,15 @@ function authorize(req, draftDocumentId) {
   }
 }
 
-function ckeConfig() {
-  const audience = process.env.CKE_ENVIRONMENT_ID;
+function ckEditorTokenGenerator() {
   const secretKey = process.env.CKE_ACCESS_KEY;
 
-  if (!audience || !secretKey) {
+  if (!secretKey) {
     throw new Error('Missing environment variables for CKEditor Cloud Services.');
   }
 
-  const token = jwt.sign({ aud: audience }, secretKey, { algorithm: 'HS256' });
-  return { headers: { 'Authorization': token } };
+  const token = jwt.sign({}, secretKey, { algorithm: 'HS256' });
+  return token;
 }
 
 const ckeDocxToHtml = (data) => {
@@ -33,7 +32,7 @@ const ckeDocxToHtml = (data) => {
   formData.append('config', JSON.stringify({default_styles: true}));
 
   return new Promise(function (resolve, reject) {
-    axios.post('https://ckeditordocxconverter.uat.healthicity.com/v2/convert/docx-html', formData, ckeConfig())
+    axios.post(process.env.DOCX_TO_HTML_CONVERTER_URL, formData, { headers: { 'Authorization': ckEditorTokenGenerator() } })
       .then(response => {
         const htmlData = response.data.html;
         resolve(htmlData);
@@ -49,5 +48,6 @@ const ckeDocxToHtml = (data) => {
 module.exports = {
   decryptAccessToken,
   authorize,
-  ckeDocxToHtml
+  ckeDocxToHtml,
+  ckEditorTokenGenerator
 }
