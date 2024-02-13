@@ -7,6 +7,7 @@ const OnlineUsers = require('../util/onlineUsers')
 const onlineUsers = new OnlineUsers()
 const OnlineDocument = require('../util/onlineDocument')
 const onlineDoc = new OnlineDocument()
+const { replaceUnsupportedHtmlTags } = require('../util/common')
 
 module.exports = (io, socket) => {
   const getDraftDocumentById = async (draftId) => {
@@ -79,17 +80,31 @@ module.exports = (io, socket) => {
 
     try {
       console.log('saving document...')
+
+      console.log("Before");
+      console.log(docDetails.content);
+
+      let docContent = replaceUnsupportedHtmlTags(docDetails.content);
+      let docHeader = replaceUnsupportedHtmlTags(docDetails.header);
+      let docFooter = replaceUnsupportedHtmlTags(docDetails.footer);
+
+      console.log("After");
+      console.log(docContent);
+      
       const draftDocument = await DraftDocumentModel.findById(draftId)
       let userIds = draftDocument.userIds
       userIds.push(socket.data.user_id)
       userIds = [...new Set(userIds)]
       await draftDocument.update({
         userIds,
-        html: docDetails.content,
-        header: docDetails.header,
-        footer: docDetails.footer
+        html: docContent,
+        header: docHeader,
+        footer: docFooter
       })
-      saveNewDocumentVersion(draftId, docDetails)
+
+      const updatedDocDetails = {content: docContent, header: docHeader, footer: docFooter};
+
+      saveNewDocumentVersion(draftId, updatedDocDetails)
       const currentUser = onlineUsers.getUser(socket.id)
       io.to(draftId).emit('documents:receiveSavedDocument', currentUser, 'Saved changes!')
 

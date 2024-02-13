@@ -45,9 +45,23 @@ const ckeDocxToHtml = (data) => {
   });
 };
 
+const replaceUnsupportedHtmlTags = (data) => {
+  let res = data.replace(/<s>/g, '<span style="inline-block;text-decoration: line-through">');
+  res = res.replace(/<\/s>/g, "</span>");
+  res = res.replace(/<mark class="marker-green">/g, '<span style="background-color: hsl(120, 93%, 68%)">');
+  res = res.replace(/<mark class="marker-yellow">/g, '<span style="background-color: hsl(60, 97%, 73%)">');
+  res = res.replace(/<mark class="marker-pink">/g, '<span style="background-color: hsl(345, 96%, 73%)">');
+  res = res.replace(/<mark class="marker-blue">/g, '<span style="background-color: hsl(201, 97%, 72%)">');
+  res = res.replace(/<mark class="pen-red">/g, '<span style="background-color: hsl(0, 85%, 49%)">');
+  res = res.replace(/<mark class="pen-green">/g, '<span style="background-color: hsl(112, 100%, 27%)">');
+  res = res.replace(/<\/mark>/g, "</span>");
+  return res;
+}
+
 
 module.exports = {
   decryptAccessToken,
   authorize,
-  ckeDocxToHtml
+  ckeDocxToHtml,
+  replaceUnsupportedHtmlTags
 }
