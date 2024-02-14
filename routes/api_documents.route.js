@@ -7,5 +7,5 @@ documentsRouter.get('/one-version/:versionId', documentsCtrl.getVersionById)
 
 documentsRouter.get('/generate-content/:draftId', documentsCtrl.generateTransformedEditorContent)
 documentsRouter.get('/upload-version/:draftId', documentsCtrl.uploadVersion)
-
+documentsRouter.get('/ckeditor/docx-converter/token', documentsCtrl.getCKEditorToken)
 module.exports = documentsRouter
