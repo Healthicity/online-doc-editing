@@ -21,8 +21,6 @@ class Document {
 
       const docxFile = await HTMLtoDOCX(draftDocument.html , draftDocument.header, {
         table: { row: { cantSplit: true } },
-        font: 'Helvetica',
-        fontSize: 28,
         header: true,
         pageNumber: true,
         footer: true,
