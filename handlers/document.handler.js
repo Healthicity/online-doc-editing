@@ -6,6 +6,7 @@ const DocumentVersionModel = require('../models/document_version')
 const OnlineUsers = require('../util/onlineUsers')
 const onlineUsers = new OnlineUsers()
 const OnlineDocument = require('../util/onlineDocument')
+const { addListStyleType } = require('../util/common')
 const onlineDoc = new OnlineDocument()
 
 module.exports = (io, socket) => {
@@ -83,13 +84,19 @@ module.exports = (io, socket) => {
       let userIds = draftDocument.userIds
       userIds.push(socket.data.user_id)
       userIds = [...new Set(userIds)]
+      const updatedContent = addListStyleType(docDetails.content);
+      const updatedHeader = addListStyleType(docDetails.header);
+      const updatedFooter = addListStyleType(docDetails.footer);
+
+      let updatedDocDetails = {content: updatedContent, header: updatedHeader, footer: updatedFooter};
+
       await draftDocument.update({
         userIds,
-        html: docDetails.content,
-        header: docDetails.header,
-        footer: docDetails.footer
+        html: updatedDocDetails.content,
+        header: updatedDocDetails.header,
+        footer:  updatedDocDetails.footer
       })
-      saveNewDocumentVersion(draftId, docDetails)
+      saveNewDocumentVersion(draftId, updatedDocDetails)
       const currentUser = onlineUsers.getUser(socket.id)
       io.to(draftId).emit('documents:receiveSavedDocument', currentUser, 'Saved changes!')
 
