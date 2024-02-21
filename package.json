@@ -22,7 +22,7 @@
     "dotenv": "^16.0.0",
     "express": "^4.17.3",
     "form-data": "^4.0.0",
-    "html-to-docx": "git+https://github.com/Healthicity/html-to-docx.git",
+    "html-to-docx": "https://github.com/Healthicity/html-to-docx/archive/refs/tags/v1.9.0-beta.tar.gz",
     "jsonwebtoken": "^9.0.2",
     "mammoth": "^1.4.19",
     "mongoose": "^6.2.3",
