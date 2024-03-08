@@ -13,7 +13,7 @@ brew tap mongodb/brew
 brew update
 brew install mongodb-community@7.0
 brew services start mongodb/brew/mongodb-community
-cp .env.development .env
+cp .env.development .env  (Make the required changes in env variables like s3 credentials)
 npm install
 NODE_ENV=development npm start
 ```
